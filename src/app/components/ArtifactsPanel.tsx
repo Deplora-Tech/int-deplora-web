@@ -1,11 +1,17 @@
 "use client"
 
-import React, { useState } from 'react'
-import { Artifact } from './App'
-import { Button } from "@/components/ui/button"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import React, { useState } from "react"
+import { Artifact } from "./App"
+import {
+  Button,
+  Card,
+  CardHeader,
+  CardContent,
+  CardActions,
+  Typography,
+  TextField,
+  Box,
+} from "@mui/material"
 
 interface ArtifactsPanelProps {
   artifacts: Artifact[]
@@ -19,16 +25,16 @@ const ArtifactsPanel: React.FC<ArtifactsPanelProps> = ({
   onPushToGit,
 }) => {
   const [editingArtifact, setEditingArtifact] = useState<string | null>(null)
-  const [editedContent, setEditedContent] = useState<string>('')
+  const [editedContent, setEditedContent] = useState<string>("")
 
   const handleCopy = (content: string) => {
     navigator.clipboard.writeText(content)
   }
 
   const handleDownload = (name: string, content: string) => {
-    const blob = new Blob([content], { type: 'text/plain' })
+    const blob = new Blob([content], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
+    const a = document.createElement("a")
     a.href = url
     a.download = name
     a.click()
@@ -41,7 +47,7 @@ const ArtifactsPanel: React.FC<ArtifactsPanelProps> = ({
   }
 
   const handleSave = (name: string) => {
-    const updatedArtifact = artifacts.find(a => a.name === name)
+    const updatedArtifact = artifacts.find((a) => a.name === name)
     if (updatedArtifact) {
       updatedArtifact.content = editedContent
       onPushToGit(updatedArtifact)
@@ -50,86 +56,73 @@ const ArtifactsPanel: React.FC<ArtifactsPanelProps> = ({
   }
 
   return (
-    <ScrollArea className="h-screen">
-      <div className="p-4 space-y-4">
-        <h2 className="font-semibold text-lg">Generated Artifacts</h2>
-        {artifacts.map((artifact) => (
-          <Card key={artifact.name}>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium">
-                {artifact.name}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              {editingArtifact === artifact.name ? (
-                <div className="space-y-2">
-                  <Textarea
-                    value={editedContent}
-                    onChange={(e) => setEditedContent(e.target.value)}
-                    className="font-mono text-sm"
-                    rows={10}
-                  />
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => handleSave(artifact.name)}
-                      size="sm"
-                    >
-                      Save
+    <Box sx={{ overflowY: "auto", height: "90vh", padding: 2 }}>
+      <Typography variant="h6" gutterBottom>
+        Generated Artifacts
+      </Typography>
+      {artifacts.map((artifact) => (
+        <Card key={artifact.name} sx={{ marginBottom: 2 }}>
+          <CardHeader
+            title={<Typography variant="subtitle1">{artifact.name}</Typography>}
+          />
+          <CardContent>
+            {editingArtifact === artifact.name ? (
+              <Box display="flex" flexDirection="column" gap={2}>
+                <TextField
+                  multiline
+                  rows={10}
+                  value={editedContent}
+                  onChange={(e) => setEditedContent(e.target.value)}
+                  variant="outlined"
+                  fullWidth
+                />
+                <Box display="flex" gap={1}>
+                  <Button variant="contained" size="small" onClick={() => handleSave(artifact.name)}>
+                    Save
+                  </Button>
+                  <Button variant="outlined" size="small" onClick={() => setEditingArtifact(null)}>
+                    Cancel
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              <Box display="flex" flexDirection="column" gap={2}>
+                <Box
+                  component="pre"
+                  sx={{
+                    backgroundColor: "action.hover",
+                    padding: 2,
+                    borderRadius: 1,
+                    fontFamily: "monospace",
+                    fontSize: "0.875rem",
+                    overflowX: "auto",
+                  }}
+                >
+                  {artifact.content}
+                </Box>
+                <CardActions sx={{ display: "flex", gap: 1 }}>
+                  <Button variant="outlined" size="small" onClick={() => handleCopy(artifact.content)}>
+                    Copy
+                  </Button>
+                  <Button variant="outlined" size="small" onClick={() => handleDownload(artifact.name, artifact.content)}>
+                    Download
+                  </Button>
+                  <Button variant="outlined" size="small" onClick={() => handleEdit(artifact.name, artifact.content)}>
+                    Edit
+                  </Button>
+                  {gitConnected && (
+                    <Button variant="contained" size="small" onClick={() => onPushToGit(artifact)}>
+                      Push to Git
                     </Button>
-                    <Button
-                      onClick={() => setEditingArtifact(null)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <pre className="bg-muted p-2 rounded-lg overflow-x-auto text-sm">
-                    {artifact.content}
-                  </pre>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => handleCopy(artifact.content)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Copy
-                    </Button>
-                    <Button
-                      onClick={() => handleDownload(artifact.name, artifact.content)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Download
-                    </Button>
-                    <Button
-                      onClick={() => handleEdit(artifact.name, artifact.content)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Edit
-                    </Button>
-                    {gitConnected && (
-                      <Button
-                        onClick={() => onPushToGit(artifact)}
-                        size="sm"
-                      >
-                        Push to Git
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </ScrollArea>
+                  )}
+                </CardActions>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      ))}
+    </Box>
   )
 }
 
 export default ArtifactsPanel
-

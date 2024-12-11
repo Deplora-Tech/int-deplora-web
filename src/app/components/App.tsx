@@ -1,145 +1,321 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react'
-import { Paperclip, ArrowUp } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Card } from "@/components/ui/card"
-import Header from './Header'
-import ChatInterface from './ChatInterface'
-import ArtifactsPanel from './ArtifactsPanel'
-import GitIntegration from './GitIntegration'
+import React, { useState, useRef } from "react";
+import { Paperclip, ArrowUp } from "lucide-react";
+import {
+  Button,
+  TextField,
+  Box,
+  Typography,
+  Card,
+  IconButton,
+  ThemeProvider,
+  createTheme,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
+import Header from "./Header";
+import ChatInterface from "./ChatInterface";
+import ArtifactsPanel from "./ArtifactsPanel";
+import { GitIntegration } from "./GitIntegration";
 
 export interface Message {
-  id: number
-  text: string
-  sender: 'user' | 'bot'
+  id: number;
+  text: string;
+  sender: "user" | "bot";
 }
 
 export interface Artifact {
-  name: string
-  content: string
+  name: string;
+  content: string;
 }
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+    background: {
+      default: "#121212",
+      paper: "#1E1E1E",
+    },
+    text: {
+      primary: "#FFFFFF",
+      secondary: "#B3B3B3",
+    },
+  },
+});
 
 const App: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [artifacts, setArtifacts] = useState<Artifact[]>([])
-  const [showArtifacts, setShowArtifacts] = useState(false)
-  const [gitConnected, setGitConnected] = useState(false)
-  const [statusMessage, setStatusMessage] = useState('')
-  const [input, setInput] = useState('')
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [artifacts, setArtifacts] = useState<Artifact[]>([]);
+  const [showArtifacts, setShowArtifacts] = useState(false);
+  const [gitConnected, setGitConnected] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [input, setInput] = useState("");
+  const [artifactPanelWidth, setArtifactPanelWidth] = useState(600);
+  const [isGitDialogOpen, setGitDialogOpen] = useState(true);
 
-  const addMessage = (text: string, sender: 'user' | 'bot') => {
-    setMessages(prevMessages => [...prevMessages, { id: Date.now(), text, sender }])
-  }
+  const isResizing = useRef(false);
 
-  const handleUserMessage = async (message: string) => {
-    addMessage(message, 'user')
-    // Simulate bot response
+  const addMessage = (text: string, sender: "user" | "bot") => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { id: Date.now(), text, sender },
+    ]);
+  };
+  const handlePushToGit = (artifact: Artifact) => {
+    setStatusMessage(`Pushing ${artifact.name} to Git repository...`);
     setTimeout(() => {
-      addMessage(`You said: ${message}`, 'bot')
-    }, 1000)
+      setStatusMessage(`${artifact.name} pushed successfully.`);
+    }, 1000);
+  };
+  const handleUserMessage = async (message: string) => {
+    addMessage(message, "user");
+    setTimeout(() => {
+      addMessage(`You said: ${message}`, "bot");
+    }, 1000);
 
-    if (message.toLowerCase().includes('artifact')) {
-      setShowArtifacts(true)
+    if (message.toLowerCase().includes("artifact")) {
+      setShowArtifacts(true);
       setArtifacts([
-        { name: 'Dockerfile', content: 'FROM python:3.9\n...' },
-        { name: 'KubernetesManifest', content: 'apiVersion: apps/v1\n...' },
-      ])
+        { name: "Dockerfile", content: "FROM python:3.9\n..." },
+        { name: "KubernetesManifest", content: "apiVersion: apps/v1\n..." },
+      ]);
     }
-  }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (input.trim()) {
-      handleUserMessage(input)
-      setInput('')
+      handleUserMessage(input);
+      setInput("");
     }
-  }
+  };
 
-  const handleGitConnect = async (repoUrl: string, username: string, password: string) => {
-    setStatusMessage('Connecting to Git repository...')
+  const handleGitConnect = async (
+    repoUrl: string,
+    username: string,
+    password: string
+  ) => {
+    setStatusMessage("Connecting to Git repository...");
     setTimeout(() => {
-      setGitConnected(true)
-      setStatusMessage('Git repository connected successfully.')
-    }, 1000)
-  }
+      setGitConnected(true);
+      setGitDialogOpen(false);
+      setStatusMessage("Git repository connected successfully.");
+    }, 1000);
+  };
 
-  const handlePushToGit = async (artifact: Artifact) => {
-    setStatusMessage('Pushing artifact to Git...')
-    setTimeout(() => {
-      setStatusMessage('Artifact pushed to Git successfully.')
-    }, 1000)
-  }
+  const handleMouseDown = (e: React.MouseEvent) => {
+    isResizing.current = true;
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isResizing.current) {
+      setArtifactPanelWidth((prevWidth) =>
+        Math.max(
+          200,
+          Math.min(window.innerWidth - 100, prevWidth - e.movementX)
+        )
+      );
+    }
+  };
+
+  const handleMouseUp = () => {
+    isResizing.current = false;
+    document.removeEventListener("mousemove", handleMouseMove);
+    document.removeEventListener("mouseup", handleMouseUp);
+  };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      <Header />
-      <main className="flex-1 flex">
-        <div className="flex-1 flex flex-col max-w-4xl mx-auto w-full p-4 gap-4">
-          {messages.length === 0 ? (
-            <div className="flex-1 flex items-center justify-center flex-col gap-4">
-              <h1 className="text-4xl font-bold tracking-tight">
-                What can I help you deploy?
-              </h1>
-              <div className="flex gap-2">
-                <Button variant="secondary" className="text-sm">
-                  Generate a Dockerfile
-                </Button>
-                <Button variant="secondary" className="text-sm">
-                  Setup Kubernetes manifests
-                </Button>
-                <Button variant="secondary" className="text-sm">
-                  Configure CI/CD pipeline
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <ScrollArea className="flex-1">
-              <ChatInterface messages={messages} />
-            </ScrollArea>
-          )}
-          <form onSubmit={handleSubmit} className="relative">
-            <Textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about deployment configurations..."
-              className="min-h-[100px] resize-none pr-20"
-            />
-            <div className="absolute right-4 bottom-4 flex gap-2">
-              <Button type="button" size="icon" variant="ghost">
-                <Paperclip className="h-4 w-4" />
-              </Button>
-              <Button type="submit" size="icon">
-                <ArrowUp className="h-4 w-4" />
-              </Button>
-            </div>
-          </form>
-        </div>
-        {showArtifacts && (
-          <Card className="w-[400px] border-l rounded-none h-screen">
-            <ArtifactsPanel
-              artifacts={artifacts}
-              gitConnected={gitConnected}
-              onPushToGit={handlePushToGit}
-            />
-            {!gitConnected && (
-              <GitIntegration onConnect={handleGitConnect} />
+    <ThemeProvider theme={darkTheme}>
+      <Box
+        display="flex"
+        flexDirection="column"
+        height="100vh"
+        bgcolor="background.default"
+        overflow="auto"
+      >
+        {/* Header */}
+        <Header gitConnected={gitConnected} />
+
+        {/* Git Integration Dialog */}
+        <Dialog
+          open={isGitDialogOpen}
+          onClose={() => {}}
+          disableEscapeKeyDown
+          sx={{
+            "& .MuiPaper-root": {
+              backgroundColor: "background.paper",
+              padding: 2,
+              borderRadius: 2,
+              boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
+              width: "600px",
+              margin: "auto",
+            },
+          }}
+        >
+          <DialogTitle
+            sx={{
+              fontSize: "1.25rem",
+              fontWeight: "bold",
+              color: "text.primary",
+              textAlign: "center",
+            }}
+          >
+            Connect to Git Repository
+          </DialogTitle>
+          <DialogContent
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+              color: "text.secondary",
+            }}
+          >
+            <GitIntegration onConnect={handleGitConnect} />
+          </DialogContent>
+        </Dialog>
+
+        <Box component="main" flex={1} display="flex" mt={8} height="80vh">
+          {/* Chat Interface */}
+          <Box
+            flex={1}
+            display="flex"
+            flexDirection="column"
+            maxWidth="1024px"
+            maxHeight="90vh"
+            mx="auto"
+            px={2}
+            gap={2}
+          >
+            {messages.length === 0 ? (
+              <Box
+                flex={1}
+                display="flex"
+                flexDirection="column"
+                alignItems="center"
+                justifyContent="center"
+                gap={2}
+              >
+                <Typography
+                  variant="h4"
+                  fontWeight="bold"
+                  color="text.primary"
+                  gutterBottom
+                >
+                  What can I help you deploy?
+                </Typography>
+                <Box display="flex" gap={2}>
+                  <Button variant="outlined" color="primary" size="small">
+                    Generate a Dockerfile
+                  </Button>
+                  <Button variant="outlined" color="primary" size="small">
+                    Setup Kubernetes manifests
+                  </Button>
+                  <Button variant="outlined" color="primary" size="small">
+                    Configure CI/CD pipeline
+                  </Button>
+                </Box>
+              </Box>
+            ) : (
+              <Box
+                flex={1}
+                sx={{
+                  overflowY: "auto",
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                  "&::-webkit-scrollbar": {
+                    display: "none",
+                  },
+                }}
+              >
+                <ChatInterface messages={messages} />
+              </Box>
             )}
-          </Card>
-        )}
-      </main>
-      {statusMessage && (
-        <div className="fixed bottom-4 right-4">
-          <Card className="p-4 bg-muted">
-            <p className="text-sm">{statusMessage}</p>
-          </Card>
-        </div>
-      )}
-    </div>
-  )
-}
+            <form onSubmit={handleSubmit}>
+              <Box position="relative" display="flex" alignItems="center">
+                <TextField
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask about deployment configurations..."
+                  multiline
+                  fullWidth
+                  rows={4}
+                  variant="outlined"
+                  sx={{
+                    backgroundColor: "background.paper",
+                    color: "text.primary",
+                  }}
+                />
+                <Box
+                  position="absolute"
+                  right={16}
+                  bottom={16}
+                  display="flex"
+                  gap={1}
+                >
+                  <IconButton>
+                    <Paperclip color="#FFFFFF" />
+                  </IconButton>
+                  <IconButton type="submit">
+                    <ArrowUp color="#FFFFFF" />
+                  </IconButton>
+                </Box>
+              </Box>
+            </form>
+          </Box>
 
-export default App
+          {/* Artifact Panel */}
+          {showArtifacts && (
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                height: "90vh",
+                overflow: "hidden",
+                width: artifactPanelWidth,
+                transition: "width 0.2s ease",
+                backgroundColor: "background.paper",
+                borderLeft: "1px solid #333",
+                position: "relative",
+                minWidth: 400,
+              }}
+            >
+              <Card
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: 0,
+                  backgroundColor: "background.paper",
+                }}
+              >
+                <ArtifactsPanel
+                  artifacts={artifacts}
+                  gitConnected={gitConnected}
+                  onPushToGit={handlePushToGit}
+                />
+              </Card>
+              <Box
+                onMouseDown={handleMouseDown}
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  left: -5,
+                  width: 10,
+                  height: "100%",
+                  cursor: "col-resize",
+                  zIndex: 2,
+                  backgroundColor: "transparent",
+                }}
+              />
+            </Box>
+          )}
+        </Box>
+      </Box>
+    </ThemeProvider>
+  );
+};
 
+export default App;
