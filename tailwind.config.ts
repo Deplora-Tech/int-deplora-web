@@ -11,8 +11,37 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        scrollbarTrack: "#1A202C",
+        scrollbarThumb: "#4A5568",
+      },
+      borderRadius: {
+        "scrollbar-rounded": "8px",
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require("tailwind-scrollbar"),
+    require("tailwindcss/plugin")(function ({
+      addUtilities,
+      theme,
+    }: {
+      addUtilities: (utilities: Record<string, any>) => void;
+      theme: (path: string) => any;
+    }) {
+      addUtilities({
+        ".scrollbar-thumb-rounded": {
+          "border-radius": theme("borderRadius.scrollbar-rounded"),
+        },
+        ".scrollbar-thumb-darker": {
+          background: theme("colors.scrollbarThumb"),
+        },
+        ".scrollbar-track-darker": {
+          background: theme("colors.scrollbarTrack"),
+        },
+      });
+    }),
+  ],
+  variants: {
+    scrollbar: ["rounded"],
+  },
 } satisfies Config;
