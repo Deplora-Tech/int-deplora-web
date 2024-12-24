@@ -5,6 +5,7 @@ import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
 import { ArrowDown, ArrowRight, Link2, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useMessages } from "../hooks/messages";
 
 interface Message {
   isBot: boolean;
@@ -12,17 +13,7 @@ interface Message {
 }
 
 export function Chat() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      isBot: false,
-      content: "hi",
-    },
-    {
-      isBot: true,
-      content:
-        "Hello! I'm Deplora, ready to help you with any software deployment tasks, questions, or technical challenges you have. What would you like to work on?",
-    },
-  ]);
+  const { messages, addMessage } = useMessages();
   const [input, setInput] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -53,18 +44,15 @@ export function Chat() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (input.trim()) {
-      setMessages([...messages, { isBot: false, content: input.trim() }]);
-      setInput("");
       setTimeout(() => {
-        setMessages((msgs) => [
-          ...msgs,
-          {
-            isBot: true,
-            content:
-              "I'll help you create a new React application using Vite, which provides a modern and fast development experience.",
-          },
-        ]);
+        addMessage({
+          content: input,
+          sender: "User",
+          timestamp: new Date(),
+          userId: 1,
+        });
       }, 1000);
+      setInput("");
     }
   };
 
@@ -76,7 +64,7 @@ export function Chat() {
       >
         {messages.map((message, index) => (
           <div key={index} className="flex gap-3 group">
-            {!message.isBot && (
+            {message.sender === "User" && (
               <Avatar className="w-8 h-8 rounded-full overflow-hidden border border-white/[0.05] shrink-0">
                 <img
                   src={"/userlogo.svg"}
@@ -88,7 +76,9 @@ export function Chat() {
             <div className="flex-1">
               <div
                 className={`rounded-lg px-4 py-3 ${
-                  message.isBot ? "bg-white/[0.02]" : "bg-white/[0.05]"
+                  message.sender === "Deplora"
+                    ? "bg-white/[0.02]"
+                    : "bg-white/[0.05]"
                 }`}
               >
                 <p className="text-sm text-neutral-200 leading-relaxed">

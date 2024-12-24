@@ -2,54 +2,21 @@
 
 import React, { useState } from "react";
 import { Badge } from "@/app/components/ui/badge";
-import { Button } from "@/app/components/ui/button";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/app/components/ui/tabs";
-import {
-  ChevronDown,
-  FileIcon,
-  FolderIcon,
-  Terminal,
-  Zap,
-  Plus,
-} from "lucide-react";
-import { detectFileType, FILE_CONTENT, tokenizeContent } from "../lib/editor";
+import { Tabs, TabsContent } from "@/app/components/ui/tabs";
+import { ChevronDown, FileIcon, FolderIcon } from "lucide-react";
+import { detectFileType, FILE_CONTENT } from "../../lib/editor";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism.css"; // Optional: Include a Prism theme for styling
+import { TabsHeader } from "./TabHeader";
+import { FooterActions } from "./FooterActions";
+import { PreviewContent } from "./PreviewContent";
 
 // File List
 const FILES = Object.keys(FILE_CONTENT);
-
-function TabsHeader() {
-  return (
-    <div className="border-b border-white/[0.02]">
-      <div className="flex items-center px-4 py-1">
-        <TabsList className="h-9 bg-transparent border-none">
-          <TabsTrigger
-            value="code"
-            className="text-sm data-[state=active]:bg-transparent data-[state=active]:text-blue-500"
-          >
-            Code
-          </TabsTrigger>
-          <TabsTrigger
-            value="preview"
-            className="text-sm data-[state=active]:bg-transparent data-[state=active]:text-blue-500"
-          >
-            Preview
-          </TabsTrigger>
-        </TabsList>
-      </div>
-    </div>
-  );
-}
 
 function FileList({
   selectedFile,
@@ -155,38 +122,6 @@ function EditorContent({
   );
 }
 
-function PreviewContent() {
-  return <div className="p-4 text-neutral-400">Preview content here</div>;
-}
-
-function FooterActions() {
-  return (
-    <div className="px-2 flex items-center justify-between border-t border-white/[0.02]">
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 text-xs text-neutral-400 hover:text-white"
-        >
-          <Terminal className="w-3 h-3 mr-1" />
-          Terminal
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 text-xs text-neutral-400 hover:text-white"
-        >
-          <Zap className="w-3 h-3 mr-1" />
-          Deplora
-        </Button>
-      </div>
-      <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-        <Plus className="w-3 h-3" />
-      </Button>
-    </div>
-  );
-}
-
 export function CodeEditor() {
   const [selectedFile, setSelectedFile] =
     useState<keyof typeof FILE_CONTENT>("Dockerfile");
@@ -214,7 +149,7 @@ export function CodeEditor() {
           </div>
         </TabsContent>
         <TabsContent value="preview" className="flex-1 mt-0">
-          <PreviewContent />
+          <PreviewContent/>
         </TabsContent>
       </Tabs>
       <FooterActions />

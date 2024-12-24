@@ -4,11 +4,6 @@ import { ArrowUpRight, ChevronDown, Download, Zap } from "lucide-react";
 import "./globals.css";
 import { Button } from "./components/ui/button";
 
-const metadata = {
-  title: "Deplora",
-  description: "AI-powered deployment platform for developers",
-};
-
 export default function RootLayout({
   children,
 }: {
@@ -23,7 +18,7 @@ export default function RootLayout({
           <div className="absolute inset-0 bg-gradient-to-b from-[#000000] via-[#0a0a0a] to-[#010101]" />
 
           {/* Light source effect at the top */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,170,255,0.02),rgba(0,0,0,0))]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,170,255,0.01),rgba(0,0,0,0))]" />
 
           {/* Slight texture overlay for depth */}
           <div className="absolute inset-0 bg-noise opacity-5 mix-blend-overlay" />

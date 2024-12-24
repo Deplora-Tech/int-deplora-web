@@ -3,6 +3,7 @@ export const detectFileType = (fileName: string) => {
   if (fileName.endsWith(".tf")) return "terraform";
   if (fileName === "Dockerfile") return "dockerfile";
   if (fileName.endsWith(".yaml") || fileName.endsWith(".yml")) return "yaml";
+  if (fileName === "jenkinsfile") return "jenkinsfile";
   return "plaintext"; // Default
 };
 
@@ -107,4 +108,25 @@ export const FILE_CONTENT = {
       ports:
       - containerPort: 80
   `,
+  "jenkinsfile": `
+  groovy
+    pipeline {
+    agent any
+    stages {
+    stage("Build") {
+      steps {
+        sh "docker build -t APP_NAME ."
+        sh "aws ecr get-login-password --region AWS_REGION | docker login --username AWS --password-stdin AWS_ACCOUNT_ID.dkr.ecr {AWS_REGION.amazonaws.com"
+        sh "docker tag APP_NAME:latest AWS_ACCOUNT_ID.dkr.ecr.AWS_REGION.amazonaws.com/APP_NAME:latest"
+        sh "docker push AWS_ACCOUNT_ID.dkr.ecr.AWS_REGION.amazonaws.com/APP_NAME:latest"
+      }
+    }
+    stage("Deploy") {
+      steps {
+        sh "aws ecs update-service --cluster APP_NAME --service APP_NAME --task-definition APP_NAME-task"
+      }
+    }
+  }
+}
+`,
 };

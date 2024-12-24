@@ -1,9 +1,10 @@
 "use client";
 
 import { Chat } from "./components/chat";
-import { CodeEditor } from "./components/code-editor";
+import { CodeEditor } from "./components/CodeEditor/CodeEditor";
 import { Landing } from "./components/landing";
 import { ResizablePanel } from "./components/resizable-panel";
+import { MessageProvider } from "./hooks/messages";
 import { useChatState } from "./hooks/use-chat-state";
 
 export default function Home() {
@@ -14,11 +15,13 @@ export default function Home() {
   }
 
   return (
-    <div className="flex-1 flex min-h-0">
-      <ResizablePanel>
-        <Chat />
-      </ResizablePanel>
-      <CodeEditor />
-    </div>
+    <MessageProvider>
+      <div className="flex-1 flex min-h-0">
+        <ResizablePanel>
+          <Chat />
+        </ResizablePanel>
+        <CodeEditor />
+      </div>
+    </MessageProvider>
   );
 }
