@@ -12,89 +12,13 @@ import {
 } from "@/app/components/ui/tabs";
 import {
   ChevronDown,
-  ChevronRight,
   FileIcon,
   FolderIcon,
   Terminal,
   Zap,
   Plus,
 } from "lucide-react";
-
-// Sample file content mapping
-const FILE_CONTENT = {
-  "index.html": `
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-  </head>
-  <body>
-    <h1>Hello, World!</h1>
-  </body>
-</html>`,
-  "package-lock.json": `
-{
-  "name": "sample-project",
-  "version": "1.0.0",
-  "dependencies": {
-    "react": "^18.0.0"
-  }
-}`,
-  "package.json": `
-{
-  "name": "sample-project",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "vite"
-  }
-}`,
-  "postcss.config.js": `
-module.exports = {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-};`,
-  "tailwind.config.js": `
-module.exports = {
-  content: ["./src/**/*.{js,ts,jsx,tsx,html}"],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};`,
-  "tsconfig.json": `
-{
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "strict": true
-  },
-  "include": ["src/**/*"]
-}`,
-  "tsconfig.node.json": `
-{
-  "compilerOptions": {
-    "composite": true,
-    "skipLibCheck": true,
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
-  },
-  "include": ["vite.config.ts"]
-}`,
-  "vite.config.ts": `
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-
-export default defineConfig({
-  plugins: [react()],
-});`,
-};
+import { detectFileType, FILE_CONTENT, tokenizeContent } from "../lib/editor";
 
 // File List
 const FILES = Object.keys(FILE_CONTENT);
@@ -167,85 +91,186 @@ function FileList({
     </ScrollArea>
   );
 }
+const highlightContent = (content: string, fileType: string) => {
+  const tokens = tokenizeContent(content, fileType);
 
-function EditorContent({ selectedFile }: { selectedFile: keyof typeof FILE_CONTENT }) {
-  const renderHighlightedContent = (content: string) => {
-    // Split the content into lines
-    const lines = content.split("\n");
+  return tokens.map((token, index, arr) => {
+    switch (fileType) {
+      case "dockerfile":
+        if (
+          /^(FROM|RUN|CMD|COPY|ENTRYPOINT|EXPOSE|WORKDIR|ENV|ARG|LABEL|USER)$/.test(
+            token
+          )
+        ) {
+          return (
+            <span key={index} className="text-[#9CDCFE]">
+              {token}
+            </span>
+          );
+        }
+        if (/^#/.test(token)) {
+          return (
+            <span key={index} className="text-neutral-500 italic">
+              {token}
+            </span>
+          );
+        }
+        if (/^".*"$/.test(token)) {
+          return (
+            <span key={index} className="text-[#CE9178]">
+              {token}
+            </span>
+          );
+        }
+        break;
 
-    return lines.map((line, index) => (
-      <div key={index}>
-        {line.split(/(\s+|[{}[\]":,])/).map((token, i) => {
-          if (/^\s+$/.test(token)) {
-            return token; // Keep whitespace as is
-          }
-          if (
-            token === "{" ||
-            token === "}" ||
-            token === "[" ||
-            token === "]"
-          ) {
-            return (
-              <span key={i} className="text-neutral-500">
-                {token}
-              </span>
-            );
-          }
-          if (/^".*"$/.test(token)) {
-            return (
-              <span key={i} className="text-[#9CDCFE]">
-                {token}
-              </span>
-            );
-          }
-          if (/^(true|false|null|\d+)$/.test(token)) {
-            return (
-              <span key={i} className="text-[#569CD6]">
-                {token}
-              </span>
-            );
-          }
-          if (/:$/.test(token)) {
-            return (
-              <span key={i} className="text-neutral-500">
-                {token}
-              </span>
-            );
-          }
+      case "terraform":
+        if (/^(resource|provider|variable|output|module|data)$/.test(token)) {
+          return (
+            <span key={index} className="text-[#9CDCFE]">
+              {token}
+            </span>
+          );
+        }
+        if (/^#|\/\/|\/\*/.test(token)) {
+          return (
+            <span key={index} className="text-neutral-500 italic">
+              {token}
+            </span>
+          );
+        }
+        if (/^".*"$/.test(token)) {
+          return (
+            <span key={index} className="text-[#CE9178]">
+              {token}
+            </span>
+          );
+        }
+        if (/^(true|false|null|\d+)$/.test(token)) {
+          return (
+            <span key={index} className="text-[#569CD6]">
+              {token}
+            </span>
+          );
+        }
+        break;
+
+      case "yaml":
+        if (/^".*"$/.test(token)) {
+          return (
+            <span key={index} className="text-[#CE9178]">
+              {token}
+            </span>
+          );
+        }
+        if (/^#/.test(token)) {
+          return (
+            <span key={index} className="text-neutral-500 italic">
+              {token}
+            </span>
+          );
+        }
+        if (/^(true|false|null|\d+)$/.test(token)) {
+          return (
+            <span key={index} className="text-[#569CD6]">
+              {token}
+            </span>
+          );
+        }
+        break;
+
+      case "json":
+        // Use existing JSON logic
+        if (["{", "}", "[", "]", ":", ","].includes(token)) {
+          return (
+            <span key={index} className="text-neutral-500">
+              {token}
+            </span>
+          );
+        }
+
+        // Keys (strings followed by colons)
+        const nextToken = arr[index + 1];
+        if (/^".*"$/.test(token) && nextToken === ":") {
+          return (
+            <span key={index} className="text-[#9CDCFE]">
+              {token}
+            </span>
+          );
+        }
+
+        // String values
+        if (/^".*"$/.test(token)) {
+          return (
+            <span key={index} className="text-[#CE9178]">
+              {token}
+            </span>
+          );
+        }
+
+        // Boolean values and numbers
+        if (/^(true|false|null|\d+)$/.test(token)) {
+          return (
+            <span key={index} className="text-[#569CD6]">
+              {token}
+            </span>
+          );
+        }
+
+        // Whitespace (preserve spacing)
+        if (/^\s+$/.test(token)) {
           return token;
-        })}
-      </div>
-    ));
-  };
+        }
+        break;
+
+      default:
+        return (
+          <span key={index} className="text-white">
+            {token}
+          </span>
+        );
+    }
+
+    // Preserve spacing
+    if (/^\s+$/.test(token)) {
+      return token;
+    }
+
+    // Default fallback
+    return (
+      <span key={index} className="text-white">
+        {token}
+      </span>
+    );
+  });
+};
+
+function EditorContent({
+  selectedFile,
+}: {
+  selectedFile: keyof typeof FILE_CONTENT;
+}) {
+  const content = FILE_CONTENT[selectedFile];
+  const fileType = detectFileType(selectedFile);
+  console.log(fileType, content);
 
   return (
-    <div className="flex-1 min-w-0">
-      <div className="border-b border-white/[0.02] px-4 py-2 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <FileIcon className="w-4 h-4 text-neutral-400" />
-          <span className="text-sm text-neutral-400">{selectedFile}</span>
+    <ScrollArea className="h-[calc(100%-40px)]">
+      <div className="relative">
+        {/* Line Numbers */}
+        <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col items-end pr-2 text-xs text-neutral-600 select-none bg-white/[0.02]">
+          {Array.from({ length: content.split("\n").length }).map((_, i) => (
+            <div key={i} className="leading-6">
+              {i + 1}
+            </div>
+          ))}
         </div>
-        <Button variant="ghost" size="icon" className="h-6 w-6">
-          <ChevronDown className="h-4 w-4" />
-        </Button>
+        {/* Highlighted Content */}
+        <pre className="p-4 pl-12 font-mono text-sm leading-6 whitespace-pre-wrap">
+          <code>{highlightContent(content, fileType)}</code>
+        </pre>
       </div>
-      <ScrollArea className="h-[calc(100%-40px)]">
-        <div className="relative">
-          <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col items-end pr-2 text-xs text-neutral-600 select-none bg-white/[0.02]">
-            {Array.from({
-              length: FILE_CONTENT[selectedFile].split("\n").length,
-            }).map((_, i) => (
-              <div key={i} className="leading-6">
-                {i + 1}
-              </div>
-            ))}
-          </div>
-          <pre className="p-4 pl-12 font-mono text-sm leading-6 whitespace-pre-wrap">
-            {renderHighlightedContent(FILE_CONTENT[selectedFile])}
-          </pre>
-        </div>
-      </ScrollArea>
-    </div>
+    </ScrollArea>
   );
 }
 
@@ -283,7 +308,7 @@ function FooterActions() {
 
 export function CodeEditor() {
   const [selectedFile, setSelectedFile] =
-    useState<keyof typeof FILE_CONTENT>("tsconfig.node.json");
+    useState<keyof typeof FILE_CONTENT>("Dockerfile");
 
   return (
     <div className="gradient-border flex-1 flex flex-col min-w-0">
