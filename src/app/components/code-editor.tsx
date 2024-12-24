@@ -19,6 +19,11 @@ import {
   Plus,
 } from "lucide-react";
 import { detectFileType, FILE_CONTENT, tokenizeContent } from "../lib/editor";
+import Editor from "react-simple-code-editor";
+import { highlight, languages } from "prismjs";
+import "prismjs/components/prism-clike";
+import "prismjs/components/prism-javascript";
+import "prismjs/themes/prism.css"; // Optional: Include a Prism theme for styling
 
 // File List
 const FILES = Object.keys(FILE_CONTENT);
@@ -91,184 +96,60 @@ function FileList({
     </ScrollArea>
   );
 }
-const highlightContent = (content: string, fileType: string) => {
-  const tokens = tokenizeContent(content, fileType);
-
-  return tokens.map((token, index, arr) => {
-    switch (fileType) {
-      case "dockerfile":
-        if (
-          /^(FROM|RUN|CMD|COPY|ENTRYPOINT|EXPOSE|WORKDIR|ENV|ARG|LABEL|USER)$/.test(
-            token
-          )
-        ) {
-          return (
-            <span key={index} className="text-[#9CDCFE]">
-              {token}
-            </span>
-          );
-        }
-        if (/^#/.test(token)) {
-          return (
-            <span key={index} className="text-neutral-500 italic">
-              {token}
-            </span>
-          );
-        }
-        if (/^".*"$/.test(token)) {
-          return (
-            <span key={index} className="text-[#CE9178]">
-              {token}
-            </span>
-          );
-        }
-        break;
-
-      case "terraform":
-        if (/^(resource|provider|variable|output|module|data)$/.test(token)) {
-          return (
-            <span key={index} className="text-[#9CDCFE]">
-              {token}
-            </span>
-          );
-        }
-        if (/^#|\/\/|\/\*/.test(token)) {
-          return (
-            <span key={index} className="text-neutral-500 italic">
-              {token}
-            </span>
-          );
-        }
-        if (/^".*"$/.test(token)) {
-          return (
-            <span key={index} className="text-[#CE9178]">
-              {token}
-            </span>
-          );
-        }
-        if (/^(true|false|null|\d+)$/.test(token)) {
-          return (
-            <span key={index} className="text-[#569CD6]">
-              {token}
-            </span>
-          );
-        }
-        break;
-
-      case "yaml":
-        if (/^".*"$/.test(token)) {
-          return (
-            <span key={index} className="text-[#CE9178]">
-              {token}
-            </span>
-          );
-        }
-        if (/^#/.test(token)) {
-          return (
-            <span key={index} className="text-neutral-500 italic">
-              {token}
-            </span>
-          );
-        }
-        if (/^(true|false|null|\d+)$/.test(token)) {
-          return (
-            <span key={index} className="text-[#569CD6]">
-              {token}
-            </span>
-          );
-        }
-        break;
-
-      case "json":
-        // Use existing JSON logic
-        if (["{", "}", "[", "]", ":", ","].includes(token)) {
-          return (
-            <span key={index} className="text-neutral-500">
-              {token}
-            </span>
-          );
-        }
-
-        // Keys (strings followed by colons)
-        const nextToken = arr[index + 1];
-        if (/^".*"$/.test(token) && nextToken === ":") {
-          return (
-            <span key={index} className="text-[#9CDCFE]">
-              {token}
-            </span>
-          );
-        }
-
-        // String values
-        if (/^".*"$/.test(token)) {
-          return (
-            <span key={index} className="text-[#CE9178]">
-              {token}
-            </span>
-          );
-        }
-
-        // Boolean values and numbers
-        if (/^(true|false|null|\d+)$/.test(token)) {
-          return (
-            <span key={index} className="text-[#569CD6]">
-              {token}
-            </span>
-          );
-        }
-
-        // Whitespace (preserve spacing)
-        if (/^\s+$/.test(token)) {
-          return token;
-        }
-        break;
-
-      default:
-        return (
-          <span key={index} className="text-white">
-            {token}
-          </span>
-        );
-    }
-
-    // Preserve spacing
-    if (/^\s+$/.test(token)) {
-      return token;
-    }
-
-    // Default fallback
-    return (
-      <span key={index} className="text-white">
-        {token}
-      </span>
-    );
-  });
-};
 
 function EditorContent({
   selectedFile,
+  fileContent,
+  setFileContent,
 }: {
   selectedFile: keyof typeof FILE_CONTENT;
+  fileContent: typeof FILE_CONTENT;
+  setFileContent: React.Dispatch<React.SetStateAction<typeof FILE_CONTENT>>;
 }) {
-  const content = FILE_CONTENT[selectedFile];
+  const content = fileContent[selectedFile];
   const fileType = detectFileType(selectedFile);
-  console.log(fileType, content);
+
+  const handleContentChange = (newContent: string) => {
+    setFileContent({
+      ...fileContent,
+      [selectedFile]: newContent,
+    });
+  };
 
   return (
-    <ScrollArea className="h-[calc(100%-40px)]">
+    <ScrollArea className="h-[calc(100%-40px)] w-full bg-gradient-to-b from-[#121212] to-black">
       <div className="relative">
         {/* Line Numbers */}
-        <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col items-end pr-2 text-xs text-neutral-600 select-none bg-white/[0.02]">
+        <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col items-end pr-2 text-xs text-neutral-600 select-none bg-white/[0.02] gap-[2px]">
           {Array.from({ length: content.split("\n").length }).map((_, i) => (
-            <div key={i} className="leading-6">
+            <div key={i} style={{ fontSize: "0.75rem" }}>
               {i + 1}
             </div>
           ))}
         </div>
-        {/* Highlighted Content */}
-        <pre className="p-4 pl-12 font-mono text-sm leading-6 whitespace-pre-wrap">
-          <code>{highlightContent(content, fileType)}</code>
-        </pre>
+        {/* Code Editor */}
+        <div className="pl-12 ">
+          <Editor
+            value={content}
+            onValueChange={handleContentChange}
+            highlight={(code) =>
+              highlight(
+                code,
+                languages[fileType] || languages.js,
+                fileType
+              ).replace(/<span class="token punctuation">(.*?)<\/span>/g, "$1")
+            }
+            style={{
+              paddingTop: 1,
+              fontFamily: '"Fira code", "Fira Mono", monospace',
+              fontSize: 12,
+              backgroundColor: "none", // Set to a neutral background
+              color: "#d4d4d4",
+              borderColor: "transparent",
+            }}
+            className="bg-none text-gray-400 focus:outline-none border-none hover:border-none"
+          />
+        </div>
       </div>
     </ScrollArea>
   );
@@ -280,7 +161,7 @@ function PreviewContent() {
 
 function FooterActions() {
   return (
-    <div className="h-10 px-2 flex items-center justify-between border-t border-white/[0.02]">
+    <div className="px-2 flex items-center justify-between border-t border-white/[0.02]">
       <div className="flex items-center gap-2">
         <Button
           variant="ghost"
@@ -309,12 +190,14 @@ function FooterActions() {
 export function CodeEditor() {
   const [selectedFile, setSelectedFile] =
     useState<keyof typeof FILE_CONTENT>("Dockerfile");
+  const [fileContent, setFileContent] = useState(FILE_CONTENT);
 
   return (
-    <div className="gradient-border flex-1 flex flex-col min-w-0">
-      <Tabs defaultValue="code" className="flex-1 flex flex-col">
+    <div className="gradient-border flex-1 flex flex-col min-w-0 h-[80vh]">
+      <Tabs defaultValue="code" className="flex-1 flex flex-col h-[76vh]">
         <TabsHeader />
-        <TabsContent value="code" className="flex-1 p-0 mt-0">
+        <div className="absolute top-0 right-10 h-[0.6px] w-full bg-gradient-to-r from-transparent via-blue-500 via-50% via-teal-400 to-transparent" />
+        <TabsContent value="code" className="flex-1 p-0 mt-0 h-[76vh]">
           <div className="flex h-full divide-x divide-white/[0.02]">
             <div className="w-64 flex flex-col border-r border-white/[0.02]">
               <FileList
@@ -322,7 +205,12 @@ export function CodeEditor() {
                 setSelectedFile={setSelectedFile}
               />
             </div>
-            <EditorContent selectedFile={selectedFile} />
+
+            <EditorContent
+              selectedFile={selectedFile}
+              fileContent={fileContent}
+              setFileContent={setFileContent}
+            />
           </div>
         </TabsContent>
         <TabsContent value="preview" className="flex-1 mt-0">

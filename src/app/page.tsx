@@ -1,16 +1,16 @@
-'use client'
+"use client";
 
-import { Chat } from "./components/chat"
-import { CodeEditor } from "./components/code-editor"
-import { Landing } from "./components/landing"
-import { ResizablePanel } from "./components/resizable-panel"
-import { useChatState } from "./hooks/use-chat-state"
+import { Chat } from "./components/chat";
+import { CodeEditor } from "./components/code-editor";
+import { Landing } from "./components/landing";
+import { ResizablePanel } from "./components/resizable-panel";
+import { useChatState } from "./hooks/use-chat-state";
 
 export default function Home() {
-  const isStarted = useChatState((state: any) => state.isStarted)
+  const isStarted = useChatState((state: any) => state.isStarted);
 
   if (!isStarted) {
-    return <Landing />
+    return <Landing />;
   }
 
   return (
@@ -20,6 +20,5 @@ export default function Home() {
       </ResizablePanel>
       <CodeEditor />
     </div>
-  )
+  );
 }
-

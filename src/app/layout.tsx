@@ -23,14 +23,16 @@ export default function RootLayout({
           <div className="absolute inset-0 bg-gradient-to-b from-[#000000] via-[#0a0a0a] to-[#010101]" />
 
           {/* Light source effect at the top */}
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.1),rgba(0,0,0,0))]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,170,255,0.02),rgba(0,0,0,0))]" />
 
           {/* Slight texture overlay for depth */}
           <div className="absolute inset-0 bg-noise opacity-5 mix-blend-overlay" />
         </div>
 
         <div className="relative flex flex-col flex-1">
-          <header className="flex h-14 items-center border-b border-white/[0.02] bg-black/40 backdrop-blur-sm">
+          <header className="relative flex h-14 items-center border-b border-white/[0.1] bg-gradient-to-r from-black/40 via-[#01010101] to-black backdrop-blur-md">
+            {/* Gradient positioned at the top-right border */}
+
             <div className="flex items-center justify-between w-full px-4">
               <div className="flex items-center gap-4">
                 <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">
@@ -74,6 +76,7 @@ export default function RootLayout({
               </div>
             </div>
           </header>
+
           <main className="flex-1 flex min-h-0 overflow-hidden p-6 gap-6">
             {children}
           </main>
