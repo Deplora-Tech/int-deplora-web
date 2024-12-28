@@ -4,45 +4,37 @@
   width="32"
   height="32"
 >
-  <!-- Gradient Definition for Outline -->
+  <!-- Gradient Definition for Dark Theme -->
   <defs>
-    <linearGradient id="outline-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#000" /> <!-- Matches blue-500 -->
-      <stop offset="100%" stop-color="#2dd4bf" /> <!-- Matches teal-400 -->
-    </linearGradient>
-    <linearGradient id="animated-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#003366">
-        <animate attributeName="stop-color" values="#003366;#000000;#003366" dur="3s" repeatCount="indefinite" />
-      </stop>
-      <stop offset="100%" stop-color="#000000">
-        <animate attributeName="stop-color" values="#000000;#003366;#000000" dur="3s" repeatCount="indefinite" />
-      </stop>
+    <radialGradient id="dark-gradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1f2937" /> <!-- Darker gray -->
+      <stop offset="100%" stop-color="#111827" /> <!-- Even darker gray -->
+    </radialGradient>
+    <linearGradient id="accent-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4ade80" /> <!-- Green accent -->
+      <stop offset="100%" stop-color="#22d3ee" /> <!-- Teal accent -->
     </linearGradient>
   </defs>
 
-  <!-- Outer Circle with Gradient Outline -->
-  <circle cx="50" cy="50" r="48" fill="#89c2ff" stroke="url(#outline-gradient)" stroke-width="2" />
-
-  <!-- Speech Bubble -->
-  <path
-    d="M50 10c-22.09 0-40 16.43-40 36.67 0 9.82 4.25 18.72 11.08 25.29 1.35 1.26 1.97 3.16 1.63 5.01l-1.5 8.5c-.2 1.12.95 2 2 1.43l9.17-5.03c1.07-.59 2.34-.83 3.58-.65 4.4.67 9.09 1.04 13.94 1.04 22.09 0 40-16.43 40-36.67S72.09 10 50 10z"
-    fill="#000"
-    opacity="0.1"
+  <!-- Outer Circle with Subtle Gradient -->
+  <circle
+    cx="50"
+    cy="50"
+    r="48"
+    fill="url(#dark-gradient)"
+    stroke="url(#accent-gradient)"
+    stroke-width="2"
   />
 
-  <!-- Inner Circle with Gradient -->
-  <circle cx="50" cy="50" r="48" fill="url(#animated-gradient)" />
+  <!-- Inner Circle for Avatar Background -->
+  <circle cx="50" cy="50" r="40" fill="#1e293b" /> <!-- Darker blue-gray -->
 
   <!-- Letters -->
   <text
     x="50"
-    y="57"
+    y="60"
     text-anchor="middle"
     font-family="Arial, sans-serif"
     font-size="30"
-    fill="#89c2ff"
-    font-weight="bold"
-  >
-    U
-  </text>
+    fill="#ffffff"> U </text>
 </svg>

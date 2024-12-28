@@ -23,7 +23,43 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [fileContent, setFileContent] = useState<Record<string, string>>({});
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 1,
+      sender: "Deplora",
+      content: "Hello! How can I help you today?",
+      timestamp: new Date(),
+      userId: 1,
+    },
+    {
+      id: 2,
+      sender: "Deplora",
+      content: "What do you want to build?",
+      timestamp: new Date(),
+      userId: 1,
+    },
+    {
+      id: 3,
+      sender: "Deplora",
+      content: "Prompt, run, edit, and deploy full-stack web apps.",
+      timestamp: new Date(),
+      userId: 1,
+    },
+    {
+      id: 4,
+      sender: "User",
+      content: "You can also ask me questions about programming.",
+      timestamp: new Date(),
+      userId: 1,
+    },
+    {
+      id: 5,
+      sender: "User",
+      content: "What is the best programming language?",
+      timestamp: new Date(),
+      userId: 1,
+    }
+  ]);
 
   const addMessage = async (message: Omit<Message, "id">) => {
     setMessages((prevMessages) => [

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { ArrowDown, ArrowRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -100,7 +100,7 @@ export function Landing() {
             onClick={handleScrollToBottom}
             style={{ bottom: "10%" }}
           >
-            <ArrowRight className="w-5 h-5" />
+            <ArrowDown className="w-5 h-5" />
           </button>
         )}
 
