@@ -13,7 +13,7 @@ type ApiResponse = {
   status: string;
   processed_message: {
     status: string;
-    response: any
+    response: any;
     folder_structure: Record<string, string>;
     file_contents: Record<string, string>;
   };
@@ -31,3 +31,4 @@ export const sendMessage = async (
   });
   return response.data;
 };
+

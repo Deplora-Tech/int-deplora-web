@@ -3,16 +3,25 @@
 import { Avatar } from "@/app/components/ui/avatar";
 import { Button } from "@/app/components/ui/button";
 import { Input } from "@/app/components/ui/input";
-import { ArrowDown, ArrowRight, Link2, Sparkles } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowRight,
+  CircleStop,
+  Link2,
+  Sparkles,
+} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useMessages } from "../hooks/messages";
+import { LoraStatus, useMessages } from "../hooks/messages";
 
 export function Chat() {
-  const { messages, addMessage } = useMessages();
+  const { messages, addMessage, loraStatus } = useMessages();
   const [input, setInput] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-
+  const isLoraActive =
+    loraStatus &&
+    loraStatus !== LoraStatus.COMPLETED &&
+    loraStatus !== LoraStatus.FAILED;
   const handleScrollToBottom = () => {
     containerRef.current?.scrollTo({
       top: containerRef.current.scrollHeight,
@@ -103,17 +112,22 @@ export function Chat() {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Message..."
-              className="pr-12  border-none text-neutral-200 placeholder-neutral-500"
+              placeholder="Type your message here"
+              className="w-full h-14 pl-4 pr-20 bg-neutral-900/50 border-neutral-800 text-white placeholder-neutral-400"
             />
             <Button
               type="submit"
               size="icon"
-              className={`absolute right-1 top-1 h-8 w-8 bg-blue-500 hover:bg-blue-600 text-white transition-opacity duration-300 ${
-                input.length > 0 ? "opacity-100 visible" : "opacity-0 invisible"
-              }`}
-            >
-              <ArrowRight className="w-4 h-4" />
+              style={{
+                display: input.length > 0 || isLoraActive ? "flex" : "none",
+              }}
+              className={`absolute right-2 top-2 h-10 w-10 bg-blue-500 hover:bg-blue-600 text-white`}
+              >
+              {isLoraActive ? (
+                <CircleStop className="h-5 w-5" />
+              ) : (
+                <ArrowRight className="h-5 w-5" />
+              )}
             </Button>
           </form>
           <div className="flex gap-2 mt-3">

@@ -82,8 +82,59 @@
   }
 }
 
+@keyframes gradientAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes glowEffect {
+  0% { box-shadow: 0 0 10px #00ffcc, 0 0 15px #00ffcc; }
+  50% { box-shadow: 0 0 20px #00ffcc, 0 0 25px #00ffcc; }
+  100% { box-shadow: 0 0 10px #00ffcc, 0 0 15px #00ffcc; }
+}
+
+.gradient-line {
+  height: 1px;
+  background: linear-gradient(270deg, #00ffcc, #0066ff);
+  background-size: 400% 400%;
+  animation: gradientAnimation 4s ease infinite;
+}
+
+.glowing-button {
+  animation: glowEffect 3s ease-in-out infinite;
+  background: linear-gradient(60deg, #00ffcc, #0066ff);
+  color: white;
+}
+
 .token.punctuation {
   all: unset;
   color: inherit !important;
   background: transparent !important;
+}
+
+@keyframes combinedEffect {
+  0% {
+    opacity: 0.6; 
+    background-position: -200%; 
+  }
+  50% {
+    opacity: 0.8;
+    background-position: 200%; 
+  }
+  100% {
+    opacity: 0.6; 
+    background-position: -200%; 
+  }
+}
+
+.typing-animation {
+  font-size: 0.8rem; 
+  font-weight: bold;
+  text-align: left;
+  background: linear-gradient(90deg, #949494, #bfbfbf, #e0e0e0); 
+  background-size: 200%; 
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent;
+  animation: combinedEffect 2.5s infinite ease-in-out; 
 }

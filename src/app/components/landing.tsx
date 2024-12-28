@@ -1,18 +1,20 @@
 "use client";
 
-import { ArrowDown, ArrowRight } from "lucide-react";
+import { ArrowDown, ArrowRight, CircleStop } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import { useMessages } from "../hooks/messages";
+import { LoraStatus, statusMessages, useMessages } from "../hooks/messages";
 import { Avatar } from "./ui/avatar";
-
 export function Landing() {
   const [input, setInput] = useState("");
-  const { messages, addMessage } = useMessages();
+  const { messages, addMessage, loraStatus } = useMessages();
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-
+  const isLoraActive =
+    loraStatus &&
+    loraStatus !== LoraStatus.COMPLETED &&
+    loraStatus !== LoraStatus.FAILED;
   const handleScrollToBottom = () => {
     containerRef.current?.scrollTo({
       top: containerRef.current.scrollHeight,
@@ -98,13 +100,21 @@ export function Landing() {
           <button
             className="absolute left-1/2 transform -translate-x-1/2 translate-y-1 bg-blue-500 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg opacity-60 hover:opacity-100 transition-opacity"
             onClick={handleScrollToBottom}
-            style={{ bottom: "10%" }}
+            style={{ bottom: "18%" }}
           >
             <ArrowDown className="w-5 h-5" />
           </button>
         )}
 
-        {/* Chat Input */}
+        {isLoraActive ? (
+          <div className="flex flex-col items-left mt-4 space-y-2">
+            <div className="gradient-line h-1 w-full"></div>
+            <div className="typing-animation text-white text-sm font-medium text-left gap-1">
+              {statusMessages[loraStatus]}
+            </div>
+          </div>
+        ) : null}
+
         <form onSubmit={handleSubmit} className="relative mt-4">
           <Input
             value={input}
@@ -115,9 +125,16 @@ export function Landing() {
           <Button
             type="submit"
             size="icon"
-            className="absolute right-2 top-2 h-10 w-10 bg-blue-500 hover:bg-blue-600 text-white"
+            style={{
+              display: input.length > 0 || isLoraActive ? "flex" : "none",
+            }}
+            className={`absolute right-2 top-2 h-10 w-10 bg-blue-500 hover:bg-blue-600 text-white`}
           >
-            <ArrowRight className="h-5 w-5" />
+            {isLoraActive ? (
+              <CircleStop className="h-5 w-5" />
+            ) : (
+              <ArrowRight className="h-5 w-5" />
+            )}
           </Button>
         </form>
         <div className="mt-2 flex items-center justify-center gap-1 text-xs text-neutral-500">
@@ -135,12 +152,12 @@ export function Landing() {
           <div>
             <div className="mt-8 flex flex-wrap gap-2 justify-center">
               {[
-                "Start a blog with Astro",
-                "Build a mobile app with NativeScript",
-                "Create a docs site with Vitepress",
-                "Scaffold UI with shadcn",
-                "Draft a presentation with Slidev",
-                "Code a video with Remotion",
+                "Generate a Docker deployment plan",
+                "Create a Kubernetes cluster setup",
+                "Automate deployment with Terraform",
+                "Set up CI/CD with Jenkins",
+                "Configure AWS for scalable deployments",
+                "Deploy a serverless app with AWS Lambda",
               ].map((suggestion) => (
                 <Button
                   key={suggestion}
@@ -157,30 +174,29 @@ export function Landing() {
 
             <div className="mt-8 text-center">
               <p className="text-sm text-neutral-500 mb-4">
-                or start a blank app with your favorite stack
+                or start by selecting a framework or deployment strategy
               </p>
-              <div className="flex justify-center gap-4">
+              <div className="flex justify-center gap-5">
                 {[
-                  "Next.js",
-                  "Vite",
-                  "Nuxt",
-                  "Nest",
-                  "Astro",
-                  "Solid",
-                  "Vue",
+                  { name: "Docker", logo: "/logos/docker.svg" },
+                  { name: "Kubernetes", logo: "/logos/kubernetes.svg" },
+                  { name: "Terraform", logo: "/logos/terraform.svg" },
+                  { name: "AWS", logo: "/logos/awslambda.svg" },
+                  { name: "Azure", logo: "/logos/googlecloud.svg" },
+                  { name: "GitHub Actions", logo: "/logos/githubactions.svg" },
                 ].map((framework) => (
                   <Button
-                    key={framework}
+                    key={framework.name}
                     variant="ghost"
-                    className="h-12 w-12 rounded-full bg-neutral-900/50 hover:bg-neutral-800"
+                    className="h-14 w-14 rounded-full bg-neutral-300 hover:bg-neutral-600"
                     onClick={() => {
-                      setInput(`Create a new ${framework} app`);
+                      setInput(`Plan a deployment using ${framework.name}`);
                     }}
                   >
                     <img
-                      src={`/placeholder.svg?text=${framework}`}
-                      alt={framework}
-                      className="w-6 h-6"
+                      src={framework.logo}
+                      alt={framework.name}
+                      className="w-12 h-12" // Increased icon size
                     />
                   </Button>
                 ))}

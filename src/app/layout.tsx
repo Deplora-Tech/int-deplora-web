@@ -17,7 +17,7 @@ export default function RootLayout({
           {/* Gradient background */}
           <div className="fixed inset-0">
             {/* Base dark gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#000000] via-[#0a0a0a] to-[#010101]" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#000000] via-[#0a0a0a] to-[#010101]" />
 
             {/* Light source effect at the top */}
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,170,255,0.01),rgba(0,0,0,0))]" />
@@ -35,15 +35,6 @@ export default function RootLayout({
                   <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">
                     Deplora
                   </span>
-                  <Button
-                    variant="ghost"
-                    className="h-8 gap-2 bg-white/[0.02] hover:bg-white/[0.05]"
-                  >
-                    <span className="text-sm text-white">
-                      Create a new React application
-                    </span>
-                    <ChevronDown className="w-4 h-4 text-neutral-500" />
-                  </Button>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
