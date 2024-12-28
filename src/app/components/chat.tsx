@@ -7,11 +7,6 @@ import { ArrowDown, ArrowRight, Link2, Sparkles } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useMessages } from "../hooks/messages";
 
-interface Message {
-  isBot: boolean;
-  content: string;
-}
-
 export function Chat() {
   const { messages, addMessage } = useMessages();
   const [input, setInput] = useState("");

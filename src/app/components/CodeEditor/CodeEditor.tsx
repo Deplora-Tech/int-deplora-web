@@ -5,62 +5,115 @@ import { Badge } from "@/app/components/ui/badge";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { Tabs, TabsContent } from "@/app/components/ui/tabs";
 import { ChevronDown, FileIcon, FolderIcon } from "lucide-react";
-import { detectFileType, FILE_CONTENT } from "../../lib/editor";
+import { detectFileType } from "../../lib/editor";
 import Editor from "react-simple-code-editor";
 import { highlight, languages } from "prismjs";
 import "prismjs/components/prism-clike";
 import "prismjs/components/prism-javascript";
-import "prismjs/themes/prism.css"; // Optional: Include a Prism theme for styling
+import "prismjs/themes/prism.css";
 import { TabsHeader } from "./TabHeader";
 import { FooterActions } from "./FooterActions";
 import { PreviewContent } from "./PreviewContent";
+import { useMessages } from "@/app/hooks/messages";
+import { ChevronRight } from "lucide-react";
 
-// File List
-const FILES = Object.keys(FILE_CONTENT);
+type FileTree = {
+  [key: string]: FileTree | string;
+};
 
-function FileList({
+// Function to build a file tree structure
+function buildFileTree(files: string[]): FileTree {
+  const tree: FileTree = {};
+  files.forEach((path) => {
+    const parts = path.split('/');
+    let current = tree;
+    parts.forEach((part, index) => {
+      if (!current[part]) {
+        current[part] = index === parts.length - 1 ? path : {};
+      }
+      current = current[part] as FileTree;
+    });
+  });
+  return tree;
+}
+
+function renderFileTree(
+  tree: FileTree,
+  openFolders: Record<string, boolean>,
+  toggleFolder: (folderPath: string) => void,
+  selectedFile: string,
+  setSelectedFile: React.Dispatch<React.SetStateAction<string>>,
+  parentPath = ''
+) {
+  return Object.entries(tree).map(([key, value]) => {
+    const fullPath = parentPath ? `${parentPath}/${key}` : key;
+    const isFolder = typeof value !== 'string';
+    const isOpen = openFolders[fullPath] || false;
+
+    return (
+      <div key={fullPath} className="pl-4">
+        {isFolder ? (
+          <div
+            className="flex items-center gap-1 cursor-pointer text-neutral-500 py-1"
+            onClick={() => toggleFolder(fullPath)}
+          >
+            {isOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+            <FolderIcon className="w-3 h-3" />
+            <span>{key}</span>
+          </div>
+        ) : (
+          <div
+            key={key}
+            onClick={() => setSelectedFile(value as string)}
+            className={`flex items-center gap-1 py-1 px-2 rounded cursor-pointer group ${
+              value === selectedFile
+                ? 'text-blue-500 bg-blue-500/10'
+                : 'hover:bg-white/[0.02]'
+            }`}
+          >
+            <FileIcon className="w-3 h-3" />
+            <span>{key}</span>
+          </div>
+        )}
+        {isFolder && isOpen && (
+          <div className="pl-4">{renderFileTree(value as FileTree, openFolders, toggleFolder, selectedFile, setSelectedFile, fullPath)}</div>
+        )}
+      </div>
+    );
+  });
+}
+
+export function FileList({
+  fileContent,
   selectedFile,
   setSelectedFile,
 }: {
+  fileContent: Record<string, string>;
   selectedFile: string;
-  setSelectedFile: React.Dispatch<
-    React.SetStateAction<keyof typeof FILE_CONTENT>
-  >;
+  setSelectedFile: React.Dispatch<React.SetStateAction<string>>;
 }) {
+  const filePaths = Object.keys(fileContent);
+  const fileTree = buildFileTree(filePaths);
+  const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({});
+
+  const toggleFolder = (folderPath: string) => {
+    setOpenFolders((prev) => ({
+      ...prev,
+      [folderPath]: !prev[folderPath],
+    }));
+  };
+
   return (
-    <ScrollArea className="flex-1">
-      <div className="p-2 text-sm">
-        <div className="flex items-center gap-1 text-neutral-500 py-1">
-          <ChevronDown className="w-3 h-3" />
-          <FolderIcon className="w-3 h-3" />
-          <span>src</span>
-        </div>
-        <div className="pl-6 space-y-1 text-neutral-400">
-          {FILES.map((file) => (
-            <div
-              key={file}
-              onClick={() => setSelectedFile(file as keyof typeof FILE_CONTENT)}
-              className={`flex items-center gap-1 py-1 px-2 rounded cursor-pointer group ${
-                file === selectedFile
-                  ? "text-blue-500 bg-blue-500/10"
-                  : "hover:bg-white/[0.02]"
-              }`}
-            >
-              <FileIcon className="w-3 h-3" />
-              <span>{file}</span>
-              {file === selectedFile && (
-                <Badge
-                  variant="outline"
-                  className="ml-auto h-4 border-white/[0.05] text-[10px] px-1 text-neutral-400 group-hover:border-white/[0.1]"
-                >
-                  Active
-                </Badge>
-              )}
-            </div>
-          ))}
-        </div>
+    <div className="flex-1 p-2 text-sm">
+      <div className="flex items-center gap-1 text-neutral-500 py-1">
+        <ChevronDown className="w-3 h-3" />
+        <FolderIcon className="w-3 h-3" />
+        <span>src</span>
       </div>
-    </ScrollArea>
+      <div className="space-y-1 text-neutral-400">
+        {renderFileTree(fileTree, openFolders, toggleFolder, selectedFile, setSelectedFile)}
+      </div>
+    </div>
   );
 }
 
@@ -69,13 +122,12 @@ function EditorContent({
   fileContent,
   setFileContent,
 }: {
-  selectedFile: keyof typeof FILE_CONTENT;
-  fileContent: typeof FILE_CONTENT;
-  setFileContent: React.Dispatch<React.SetStateAction<typeof FILE_CONTENT>>;
+  selectedFile: string;
+  fileContent: Record<string, string>;
+  setFileContent: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }) {
   const content = fileContent[selectedFile];
   const fileType = detectFileType(selectedFile);
-
   const handleContentChange = (newContent: string) => {
     setFileContent({
       ...fileContent,
@@ -94,7 +146,6 @@ function EditorContent({
             </div>
           ))}
         </div>
-        {/* Code Editor */}
         <div className="pl-12 ">
           <Editor
             value={content}
@@ -110,7 +161,7 @@ function EditorContent({
               paddingTop: 1,
               fontFamily: '"Fira code", "Fira Mono", monospace',
               fontSize: 12,
-              backgroundColor: "none", // Set to a neutral background
+              backgroundColor: "none",
               color: "#d4d4d4",
               borderColor: "transparent",
             }}
@@ -123,9 +174,10 @@ function EditorContent({
 }
 
 export function CodeEditor() {
-  const [selectedFile, setSelectedFile] =
-    useState<keyof typeof FILE_CONTENT>("Dockerfile");
-  const [fileContent, setFileContent] = useState(FILE_CONTENT);
+  const { fileContent, setFileContent } = useMessages();
+  const [selectedFile, setSelectedFile] = useState(
+    Object.keys(fileContent)[0] as keyof typeof fileContent
+  );
 
   return (
     <div className="gradient-border flex-1 flex flex-col min-w-0 h-[80vh]">
@@ -136,6 +188,7 @@ export function CodeEditor() {
           <div className="flex h-full divide-x divide-white/[0.02]">
             <div className="w-64 flex flex-col border-r border-white/[0.02]">
               <FileList
+                fileContent={fileContent}
                 selectedFile={selectedFile}
                 setSelectedFile={setSelectedFile}
               />
@@ -149,7 +202,7 @@ export function CodeEditor() {
           </div>
         </TabsContent>
         <TabsContent value="preview" className="flex-1 mt-0">
-          <PreviewContent/>
+          <PreviewContent />
         </TabsContent>
       </Tabs>
       <FooterActions />

@@ -4,24 +4,21 @@ import { Chat } from "./components/chat";
 import { CodeEditor } from "./components/CodeEditor/CodeEditor";
 import { Landing } from "./components/landing";
 import { ResizablePanel } from "./components/resizable-panel";
-import { MessageProvider } from "./hooks/messages";
-import { useChatState } from "./hooks/use-chat-state";
+import { useMessages } from "./hooks/messages";
 
 export default function Home() {
-  const isStarted = useChatState((state: any) => state.isStarted);
+  const { messages, fileContent } = useMessages();
 
-  if (!isStarted) {
+  if (Object.keys(fileContent).length === 0) {
     return <Landing />;
   }
 
   return (
-    <MessageProvider>
-      <div className="flex-1 flex min-h-0">
-        <ResizablePanel>
-          <Chat />
-        </ResizablePanel>
-        <CodeEditor />
-      </div>
-    </MessageProvider>
+    <div className="flex-1 flex min-h-0">
+      <ResizablePanel>
+        <Chat />
+      </ResizablePanel>
+      <CodeEditor />
+    </div>
   );
 }

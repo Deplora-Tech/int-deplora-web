@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
+import { sendMessage } from "../api/api";
+import { FILE_CONTENT } from "../lib/editor";
 
 type Message = {
   id: number;
@@ -11,6 +13,8 @@ type Message = {
 interface MessageContextType {
   messages: Message[];
   addMessage: (message: Omit<Message, "id">) => void;
+  fileContent: Record<string, string>;
+  setFileContent: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
 const MessageContext = createContext<MessageContextType | undefined>(undefined);
@@ -18,34 +22,43 @@ const MessageContext = createContext<MessageContextType | undefined>(undefined);
 export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 1,
-      sender: "Deplora",
-      content:
-        "Hello! I'm Deplora, ready to help you with any software deployment tasks, questions, or technical challenges you have. What would you like to work on?",
-      timestamp: new Date(),
-      userId: 1,
-    },
-    {
-      id: 2,
-      sender: "User",
-      content:
-        "I'm trying to deploy a new React application. Can you help me with that?",
-      timestamp: new Date(),
-      userId: 1,
-    },
-  ]);
+  const [fileContent, setFileContent] = useState<Record<string, string>>({});
+  const [messages, setMessages] = useState<Message[]>([]);
 
-  const addMessage = (message: Omit<Message, "id">) => {
+  const addMessage = async (message: Omit<Message, "id">) => {
     setMessages((prevMessages) => [
       ...prevMessages,
-      { id: prevMessages.length + 1, ...message }, // Auto-generate IDs
+      { id: prevMessages.length + 1, ...message },
     ]);
+
+    const reply = await sendMessage({
+      message: message.content,
+      client_id: "1",
+      project_id: "1",
+      organization_id: "1",
+      session_id: "1",
+      chat_history: {},
+    });
+
+    const messageContent = reply.processed_message.response;
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      {
+        id: prevMessages.length + 1,
+        sender: "Deplora",
+        content: messageContent,
+        timestamp: new Date(),
+        userId: 1,
+      },
+    ]);
+    const fileContents = reply.processed_message.file_contents;
+    if (fileContents) setFileContent(fileContents);
   };
 
   return (
-    <MessageContext.Provider value={{ messages, addMessage }}>
+    <MessageContext.Provider
+      value={{ messages, addMessage, fileContent, setFileContent }}
+    >
       {children}
     </MessageContext.Provider>
   );
