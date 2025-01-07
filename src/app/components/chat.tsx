@@ -85,7 +85,7 @@ export function Chat() {
                     : "bg-white/[0.05]"
                 }`}
               >
-                <p className="text-sm text-neutral-200 leading-relaxed">
+                <p className="text-sm text-neutral-300 leading-relaxed">
                   {message.content}
                 </p>
               </div>
@@ -122,7 +122,7 @@ export function Chat() {
                 display: input.length > 0 || isLoraActive ? "flex" : "none",
               }}
               className={`absolute right-2 top-2 h-10 w-10 bg-blue-500 hover:bg-blue-600 text-white`}
-              >
+            >
               {isLoraActive ? (
                 <CircleStop className="h-5 w-5" />
               ) : (

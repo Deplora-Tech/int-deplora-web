@@ -46,14 +46,7 @@ export default function RootLayout({
                     Export
                     <ChevronDown className="w-4 h-4 ml-1" />
                   </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-neutral-400 hover:text-white"
-                  >
-                    <Zap className="w-4 h-4 mr-2" />
-                    Connect to Supabase
-                  </Button>
+                 
                   <Button
                     size="sm"
                     className="bg-blue-500 hover:bg-blue-600 text-white"
