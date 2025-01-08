@@ -10,8 +10,7 @@ export default function Home() {
   const { loraStatus, fileContent } = useMessages();
 
   if (
-    Object.keys(fileContent).length === 0 ||
-    loraStatus === LoraStatus.GATHERING_DATA
+    Object.keys(fileContent).length === 0
   ) {
     return <Landing />;
   }

@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import { sendMessage } from "../api/api";
+import { v4 } from "uuid";
 
 export enum LoraStatus {
   STARTING = "STARTING",
@@ -59,6 +60,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     undefined
   );
   const websocketRef = useRef<WebSocket | null>(null);
+  const session_id = v4()
 
   useEffect(() => {
     const websocket = new WebSocket(`${process.env.NEXT_PUBLIC_API_URL}/ws/1`);
@@ -98,7 +100,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         client_id: "1",
         project_id: "1",
         organization_id: "1",
-        session_id: "1",
+        session_id: session_id,
         chat_history: {},
       });
 
@@ -114,7 +116,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         },
       ]);
       const fileContents = reply.processed_message.file_contents;
-      if (fileContents) setFileContent(fileContents);
+      if (Object.keys(fileContents).length) setFileContent(fileContents);
     } catch (error) {
       console.error("Error sending message:", error);
       setLoraStatus(LoraStatus.FAILED);
