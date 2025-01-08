@@ -25,12 +25,12 @@ export const statusMessages: Record<LoraStatus, string> = {
   [LoraStatus.RETRIEVING_USER_PREFERENCES]: "Retrieving user preferences...",
   [LoraStatus.RETRIEVING_PROJECT_DETAILS]: "Fetching project details...",
   [LoraStatus.GENERATING_DEPLOYMENT_PLAN]: "Generating the deployment plan...",
-  [LoraStatus.GENERATED_DEPLOYMENT_PLAN]: "Deployment plan generated successfully!",
+  [LoraStatus.GENERATED_DEPLOYMENT_PLAN]:
+    "Deployment plan generated successfully!",
   [LoraStatus.GATHERING_DATA]: "Gathering additional data...",
   [LoraStatus.COMPLETED]: "Process completed successfully!",
   [LoraStatus.FAILED]: "Something went wrong. Please try again.",
 };
-
 
 type Message = {
   id: number;
@@ -55,9 +55,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [fileContent, setFileContent] = useState<Record<string, string>>({});
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loraStatus, setLoraStatus] = useState<LoraStatus | undefined>(
-    undefined
-  );
+  const [loraStatus, setLoraStatus] = useState<LoraStatus | undefined>();
   const websocketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -99,7 +97,6 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         project_id: "1",
         organization_id: "1",
         session_id: "1",
-        chat_history: {},
       });
 
       const messageContent = reply.processed_message.response;
@@ -114,7 +111,14 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         },
       ]);
       const fileContents = reply.processed_message.file_contents;
-      if (fileContents) setFileContent(fileContents);
+      console.log("File contents:", fileContents);
+      if (fileContents && Object.entries(fileContents).length > 0) {
+        console.log("Setting file content");
+        setFileContent(fileContents);
+      } else {
+        console.log("No file content");
+      }
+      setLoraStatus(LoraStatus.COMPLETED);
     } catch (error) {
       console.error("Error sending message:", error);
       setLoraStatus(LoraStatus.FAILED);

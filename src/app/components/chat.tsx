@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { LoraStatus, useMessages } from "../hooks/messages";
+import AnimatedStatus from "./animated-status";
 
 export function Chat() {
   const { messages, addMessage, loraStatus } = useMessages();
@@ -67,29 +68,34 @@ export function Chat() {
         className="flex-1 overflow-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
       >
         {messages.map((message, index) => (
-          <div key={index} className="flex gap-3 group">
-            {message.sender === "User" && (
-              <Avatar className="w-8 h-8 rounded-full overflow-hidden border border-white/[0.05] shrink-0">
-                <img
-                  src={"/userlogo.svg"}
-                  alt={"User"}
-                  className="object-cover"
-                />
-              </Avatar>
-            )}
-            <div className="flex-1">
-              <div
-                className={`rounded-lg px-4 py-3 ${
-                  message.sender === "Deplora"
-                    ? "bg-white/[0.02]"
-                    : "bg-white/[0.05]"
-                }`}
-              >
-                <p className="text-sm text-neutral-300 leading-relaxed">
-                  {message.content}
-                </p>
+          <div className="flex-col gap-1" key={index}>
+            <div key={index} className="flex gap-3 group pb-3">
+              {message.sender === "User" && (
+                <Avatar className="w-8 h-8 rounded-full overflow-hidden border border-white/[0.05] shrink-0">
+                  <img
+                    src={"/userlogo.svg"}
+                    alt={"User"}
+                    className="object-cover"
+                  />
+                </Avatar>
+              )}
+              <div className="flex-1">
+                <div
+                  className={`rounded-lg px-4 py-3 ${
+                    message.sender === "Deplora"
+                      ? "bg-white/[0.02]"
+                      : "bg-white/[0.05]"
+                  }`}
+                >
+                  <p className="text-sm text-neutral-300 leading-relaxed">
+                    {message.content}
+                  </p>
+                </div>
               </div>
             </div>
+            {message.sender === "User" && (
+              <AnimatedStatus isActive={index === messages.length - 1} />
+            )}
           </div>
         ))}
       </div>

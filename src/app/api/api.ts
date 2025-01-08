@@ -6,7 +6,6 @@ type MessageRequestBody = {
   project_id: string;
   organization_id: string;
   session_id: string;
-  chat_history: Record<string, any>;
 };
 
 type ApiResponse = {
