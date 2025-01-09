@@ -1,11 +1,10 @@
-'use client'
+"use client";
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Loader2, CheckCircle2, XCircle, ArrowRight } from 'lucide-react'
-import { Card, CardContent } from './ui/card'
-import { LoraStatus } from '../hooks/messages'
-
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, CheckCircle2, XCircle, ArrowRight } from "lucide-react";
+import { Card, CardContent } from "./ui/card";
+import { LoraStatus, useMessages } from "../hooks/messages";
 
 export const statusMessages: Record<LoraStatus, string> = {
   [LoraStatus.STARTING]: "Starting the process...",
@@ -13,38 +12,45 @@ export const statusMessages: Record<LoraStatus, string> = {
   [LoraStatus.RETRIEVING_USER_PREFERENCES]: "Retrieving user preferences...",
   [LoraStatus.RETRIEVING_PROJECT_DETAILS]: "Fetching project details...",
   [LoraStatus.GENERATING_DEPLOYMENT_PLAN]: "Generating the deployment plan...",
-  [LoraStatus.GENERATED_DEPLOYMENT_PLAN]: "Deployment plan generated successfully!",
+  [LoraStatus.GENERATED_DEPLOYMENT_PLAN]:
+    "Deployment plan generated successfully!",
   [LoraStatus.GATHERING_DATA]: "Gathering additional data...",
   [LoraStatus.COMPLETED]: "Process completed successfully!",
   [LoraStatus.FAILED]: "Something went wrong. Please try again.",
-}
+};
 
 interface StatusItemProps {
-  message: string
-  isActive: boolean
-  isCompleted: boolean
-  isFailed: boolean
-  shouldShow: boolean
+  message: string;
+  isActive: boolean;
+  isCompleted: boolean;
+  isFailed: boolean;
+  shouldShow: boolean;
 }
 
-function StatusItem({ message, isActive, isCompleted, isFailed, shouldShow }: StatusItemProps) {
-  if (!shouldShow) return null
+function StatusItem({
+  message,
+  isActive,
+  isCompleted,
+  isFailed,
+  shouldShow,
+}: StatusItemProps) {
+  if (!shouldShow) return null;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10, height: 0 }}
-      animate={{ opacity: 1, y: 0, height: 'auto' }}
+      animate={{ opacity: 1, y: 0, height: "auto" }}
       exit={{ opacity: 0, y: -20, height: 0 }}
       transition={{ duration: 0.3 }}
-      className={`flex items-center gap-3 p-4 rounded-lg transition-colors ${
-        isActive ? 'bg-primary/10' : ''
+      className={`flex items-center gap-3 p-3 rounded-lg transition-colors text-white/70${
+        isActive ? "bg-primary/10" : ""
       }`}
     >
       <div className="flex-shrink-0">
         {isFailed ? (
           <XCircle className="h-5 w-5 text-red-500" />
         ) : isCompleted ? (
-          <CheckCircle2 className="h-5 w-5 text-green-500" />
+          <CheckCircle2 className="h-5 w-5 text-green-400/60" />
         ) : isActive ? (
           <motion.div
             animate={{ rotate: 360 }}
@@ -53,39 +59,40 @@ function StatusItem({ message, isActive, isCompleted, isFailed, shouldShow }: St
             <Loader2 className="h-5 w-5 text-primary" />
           </motion.div>
         ) : (
-          <ArrowRight className="h-5 w-5 text-muted-foreground" />
+          ""
         )}
       </div>
-      <span className={`text-sm ${
-        isActive ? 'text-primary font-medium' : 'text-muted-foreground'
-      }`}>
-        {message}
-      </span>
+      <span className={`text-sm ${"text-muted-foreground"}`}>{message}</span>
     </motion.div>
-  )
+  );
 }
 
-export default function AnimatedStatus({isActive}: {isActive: boolean}) {
-  const [currentStatus, setCurrentStatus] = useState<LoraStatus>(LoraStatus.STARTING)
-  const [visibleSteps, setVisibleSteps] = useState<number>(1)
-  const statusOrder = Object.values(LoraStatus)
+export default function AnimatedStatus({ isActive }: { isActive: boolean }) {
+  const { loraStatus } = useMessages();
+  const [currentStatus, setCurrentStatus] = useState<LoraStatus>(
+    LoraStatus.STARTING
+  );
+  const [visibleSteps, setVisibleSteps] = useState<number>(1);
+  const statusOrder = Object.values(LoraStatus);
 
   useEffect(() => {
-    if (currentStatus === LoraStatus.COMPLETED || currentStatus === LoraStatus.FAILED) return
+    if (!loraStatus) return;
 
-    const timer = setTimeout(() => {
-      const currentIndex = statusOrder.indexOf(currentStatus)
-      if (currentIndex < statusOrder.length - 2) { // -2 to exclude COMPLETED and FAILED
-        setCurrentStatus(statusOrder[currentIndex + 1])
-        setVisibleSteps(prev => prev + 1)
-      } else {
-        setCurrentStatus(LoraStatus.COMPLETED)
-        setVisibleSteps(statusOrder.length)
-      }
-    }, 2000)
+    setCurrentStatus(loraStatus);
 
-    return () => clearTimeout(timer)
-  }, [currentStatus])
+    const stepIndex = statusOrder.indexOf(loraStatus);
+    if (stepIndex >= 0) {
+      setVisibleSteps(stepIndex + 1);
+    }
+
+    // Stop circular loader on completion or failure
+    if (
+      loraStatus === LoraStatus.COMPLETED ||
+      loraStatus === LoraStatus.FAILED
+    ) {
+      setVisibleSteps(statusOrder.length); // Show all steps
+    }
+  }, [loraStatus, statusOrder]);
 
   return (
     <Card className="w-full mx-auto">
@@ -96,7 +103,11 @@ export default function AnimatedStatus({isActive}: {isActive: boolean}) {
               <StatusItem
                 key={status}
                 message={message}
-                isActive={currentStatus === status}
+                isActive={
+                  currentStatus === status &&
+                  currentStatus !== LoraStatus.COMPLETED &&
+                  currentStatus !== LoraStatus.FAILED
+                } // Stop loader when completed or failed
                 isCompleted={
                   statusOrder.indexOf(status as LoraStatus) <
                   statusOrder.indexOf(currentStatus)
@@ -112,6 +123,5 @@ export default function AnimatedStatus({isActive}: {isActive: boolean}) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-
