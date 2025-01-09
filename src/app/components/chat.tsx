@@ -29,6 +29,7 @@ export function Chat() {
       behavior: "smooth",
     });
   };
+  const [animatedStatus, setAnimatedStatus] = useState()
 
   const handleScroll = () => {
     if (containerRef.current) {

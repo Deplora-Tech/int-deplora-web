@@ -33,9 +33,9 @@ export const statusMessages: Record<LoraStatus, string> = {
 };
 
 type Message = {
-  id: number;
-  sender: string;
+  id: string;
   content: string;
+  sender: "User" | "Deplora";
   timestamp: Date;
   userId: number;
 };
@@ -43,6 +43,9 @@ type Message = {
 interface MessageContextType {
   messages: Message[];
   addMessage: (message: Omit<Message, "id">) => void;
+  updateMessageStatus: (status: LoraStatus) => void;
+  statusMap: Record<string, LoraStatus[]>;
+  currentMessageId: string | null;
   fileContent: Record<string, string>;
   setFileContent: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   loraStatus?: LoraStatus;
@@ -53,6 +56,8 @@ const MessageContext = createContext<MessageContextType | undefined>(undefined);
 export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const [statusMap, setStatusMap] = useState<Record<string, LoraStatus[]>>({});
+  const [currentMessageId, setCurrentMessageId] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<Record<string, string>>({});
   const [messages, setMessages] = useState<Message[]>([]);
   const [loraStatus, setLoraStatus] = useState<LoraStatus | undefined>();
@@ -68,7 +73,11 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
 
     websocket.onmessage = (event) => {
       console.log("WebSocket message received:", event.data);
-      if (event.data in LoraStatus) setLoraStatus(event.data);
+
+      if (event.data in LoraStatus) {
+        setLoraStatus(event.data);
+        updateMessageStatus(event.data);
+      }
     };
 
     websocket.onclose = () => {
@@ -85,11 +94,11 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const addMessage = async (message: Omit<Message, "id">) => {
-    setLoraStatus(LoraStatus.STARTING);
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { id: prevMessages.length + 1, ...message },
-    ]);
+    const id = crypto.randomUUID();
+    setMessages((prev) => [...prev, { ...message, id }]);
+    setStatusMap((prev) => ({ ...prev, [id]: [LoraStatus.STARTING] }));
+    setCurrentMessageId(id);
+
     try {
       const reply = await sendMessage({
         message: message.content,
@@ -100,35 +109,57 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       const messageContent = reply.processed_message.response;
-      setMessages((prevMessages) => [
-        ...prevMessages,
+      setMessages((prev) => [
+        ...prev,
         {
-          id: prevMessages.length + 1,
+          id: crypto.randomUUID(),
           sender: "Deplora",
           content: messageContent,
           timestamp: new Date(),
           userId: 1,
         },
       ]);
+
       const fileContents = reply.processed_message.file_contents;
-      console.log("File contents:", fileContents);
       if (fileContents && Object.entries(fileContents).length > 0) {
-        console.log("Setting file content");
         setFileContent(fileContents);
-      } else {
-        console.log("No file content");
       }
-      setLoraStatus(LoraStatus.COMPLETED);
+      updateMessageStatus(LoraStatus.COMPLETED);
     } catch (error) {
       console.error("Error sending message:", error);
-      setLoraStatus(LoraStatus.FAILED);
-      return;
+      updateMessageStatus(LoraStatus.FAILED);
+    }
+  };
+
+  // Update the status of the current message
+  const updateMessageStatus = (status: LoraStatus) => {
+    if (!currentMessageId) return;
+
+    setStatusMap((prev) => {
+      const currentStatuses = prev[currentMessageId] || [];
+      return {
+        ...prev,
+        [currentMessageId]: [...currentStatuses, status],
+      };
+    });
+
+    if (status === LoraStatus.COMPLETED || status === LoraStatus.FAILED) {
+      setCurrentMessageId(null); // Reset the current message after completion
     }
   };
 
   return (
     <MessageContext.Provider
-      value={{ messages, addMessage, fileContent, setFileContent, loraStatus }}
+      value={{
+        messages,
+        addMessage,
+        updateMessageStatus,
+        statusMap,
+        currentMessageId,
+        fileContent,
+        setFileContent,
+        loraStatus,
+      }}
     >
       {children}
     </MessageContext.Provider>
