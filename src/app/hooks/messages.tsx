@@ -94,6 +94,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const addMessage = async (message: Omit<Message, "id">) => {
+    setLoraStatus(LoraStatus.STARTING);
     const id = crypto.randomUUID();
     setMessages((prev) => [...prev, { ...message, id }]);
     setStatusMap((prev) => ({ ...prev, [id]: [LoraStatus.STARTING] }));
@@ -134,7 +135,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   // Update the status of the current message
   const updateMessageStatus = (status: LoraStatus) => {
     if (!currentMessageId) return;
-
+    console.log("Updating message status:", status);
     setStatusMap((prev) => {
       const currentStatuses = prev[currentMessageId] || [];
       return {
@@ -142,6 +143,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         [currentMessageId]: [...currentStatuses, status],
       };
     });
+    console.log("Status map:", statusMap);
 
     if (status === LoraStatus.COMPLETED || status === LoraStatus.FAILED) {
       setCurrentMessageId(null); // Reset the current message after completion

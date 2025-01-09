@@ -15,7 +15,8 @@ import { LoraStatus, useMessages } from "../hooks/messages";
 import AnimatedStatus from "./animated-status";
 
 export function Chat() {
-  const { messages, addMessage, loraStatus } = useMessages();
+  const { messages, addMessage, loraStatus, statusMap, currentMessageId } =
+    useMessages();
   const [input, setInput] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -29,7 +30,6 @@ export function Chat() {
       behavior: "smooth",
     });
   };
-  const [animatedStatus, setAnimatedStatus] = useState()
 
   const handleScroll = () => {
     if (containerRef.current) {
@@ -63,7 +63,7 @@ export function Chat() {
   };
 
   return (
-    <div className="gradient-border flex flex-col min-w-[350px] max-w-[450px] h-full max-h-[90vh] rounded-lg border border-white/[0.05] relative">
+    <div className="gradient-border flex flex-col min-w-[350px] max-w-[450px] h-full max-h-[90vh] rounded-lg border border-white/[0.05] relative ">
       <div
         ref={containerRef}
         className="flex-1 overflow-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
@@ -94,8 +94,8 @@ export function Chat() {
                 </div>
               </div>
             </div>
-            {message.sender === "User" && (
-              <AnimatedStatus isActive={index === messages.length - 1} />
+            {statusMap[message.id] && (
+              <AnimatedStatus statuses={statusMap[message.id]} />
             )}
           </div>
         ))}
