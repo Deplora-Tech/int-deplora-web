@@ -136,9 +136,11 @@ export function Chat() {
               )}
             </Button>
           </form>
-          <div className="flex gap-2 mt-3">
-            <Button
-              variant="ghost"
+
+      {/* Scroll-to-Bottom Button */}
+      {showScrollButton && (
+        <Button
+          variant="ghost"
               size="sm"
               className="h-8 px-3 text-neutral-400 hover:text-white hover:bg-[#2C2C2C]"
             >
