@@ -1,4 +1,5 @@
-import React, {
+import type React from "react";
+import {
   createContext,
   useContext,
   useEffect,
@@ -63,7 +64,9 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const [loraStatus, setLoraStatus] = useState<LoraStatus | undefined>();
   const websocketRef = useRef<WebSocket | null>(null);
-  const session_id = v4()
+  const [session_id, setSessionId] = useState<string>(v4());
+
+  console.log("Session ID:", session_id);
 
   useEffect(() => {
     const websocket = new WebSocket(`${process.env.NEXT_PUBLIC_API_URL}/ws/1`);
