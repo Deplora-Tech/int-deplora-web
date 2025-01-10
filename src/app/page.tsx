@@ -12,6 +12,7 @@ export default function Home() {
   const [hasFiles, setHasFiles] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
+
   useEffect(() => {
     if (loraStatus === LoraStatus.STARTING) {
       setIsChatOpen(true);
