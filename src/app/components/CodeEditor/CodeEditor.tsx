@@ -1,7 +1,5 @@
 "use client";
 
-import React, { useState } from "react";
-import { Badge } from "@/app/components/ui/badge";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
 import { Tabs, TabsContent } from "@/app/components/ui/tabs";
 import { ChevronDown, FileIcon, FolderIcon } from "lucide-react";
@@ -13,9 +11,10 @@ import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism.css";
 import { TabsHeader } from "./TabHeader";
 import { FooterActions } from "./FooterActions";
-import { PreviewContent } from "./PreviewContent";
 import { useMessages } from "@/app/hooks/messages";
 import { ChevronRight } from "lucide-react";
+import { useState } from "react";
+import PreviewContent from "./PreviewContent";
 
 type FileTree = {
   [key: string]: FileTree | string;
@@ -25,7 +24,7 @@ type FileTree = {
 function buildFileTree(files: string[]): FileTree {
   const tree: FileTree = {};
   files.forEach((path) => {
-    const parts = path.split('/');
+    const parts = path.split("/");
     let current = tree;
     parts.forEach((part, index) => {
       if (!current[part]) {
@@ -43,11 +42,11 @@ function renderFileTree(
   toggleFolder: (folderPath: string) => void,
   selectedFile: string,
   setSelectedFile: React.Dispatch<React.SetStateAction<string>>,
-  parentPath = ''
+  parentPath = ""
 ) {
   return Object.entries(tree).map(([key, value]) => {
     const fullPath = parentPath ? `${parentPath}/${key}` : key;
-    const isFolder = typeof value !== 'string';
+    const isFolder = typeof value !== "string";
     const isOpen = openFolders[fullPath] || false;
 
     return (
@@ -57,7 +56,11 @@ function renderFileTree(
             className="flex items-center gap-1 cursor-pointer text-neutral-500 py-1"
             onClick={() => toggleFolder(fullPath)}
           >
-            {isOpen ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+            {isOpen ? (
+              <ChevronDown className="w-3 h-3" />
+            ) : (
+              <ChevronRight className="w-3 h-3" />
+            )}
             <FolderIcon className="w-3 h-3" />
             <span>{key}</span>
           </div>
@@ -67,8 +70,8 @@ function renderFileTree(
             onClick={() => setSelectedFile(value as string)}
             className={`flex items-center gap-1 py-1 px-2 rounded cursor-pointer group ${
               value === selectedFile
-                ? 'text-blue-500 bg-blue-500/10'
-                : 'hover:bg-white/[0.02]'
+                ? "text-blue-500 bg-blue-500/10"
+                : "hover:bg-white/[0.02]"
             }`}
           >
             <FileIcon className="w-3 h-3" />
@@ -76,7 +79,16 @@ function renderFileTree(
           </div>
         )}
         {isFolder && isOpen && (
-          <div className="pl-4">{renderFileTree(value as FileTree, openFolders, toggleFolder, selectedFile, setSelectedFile, fullPath)}</div>
+          <div className="pl-4">
+            {renderFileTree(
+              value as FileTree,
+              openFolders,
+              toggleFolder,
+              selectedFile,
+              setSelectedFile,
+              fullPath
+            )}
+          </div>
         )}
       </div>
     );
@@ -111,7 +123,13 @@ export function FileList({
         <span>src</span>
       </div>
       <div className="space-y-1 text-neutral-400">
-        {renderFileTree(fileTree, openFolders, toggleFolder, selectedFile, setSelectedFile)}
+        {renderFileTree(
+          fileTree,
+          openFolders,
+          toggleFolder,
+          selectedFile,
+          setSelectedFile
+        )}
       </div>
     </div>
   );

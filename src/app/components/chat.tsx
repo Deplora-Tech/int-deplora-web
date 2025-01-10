@@ -12,9 +12,11 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { LoraStatus, useMessages } from "../hooks/messages";
+import AnimatedStatus from "./animated-status";
 
 export function Chat() {
-  const { messages, addMessage, loraStatus } = useMessages();
+  const { messages, addMessage, loraStatus, statusMap, currentMessageId } =
+    useMessages();
   const [input, setInput] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -61,35 +63,40 @@ export function Chat() {
   };
 
   return (
-    <div className="gradient-border flex flex-col min-w-[350px] max-w-[450px] h-full max-h-[90vh] rounded-lg border border-white/[0.05] relative">
+    <div className="gradient-border flex flex-col min-w-[350px] max-w-[450px] h-full max-h-[90vh] rounded-lg border border-white/[0.05] relative ">
       <div
         ref={containerRef}
         className="flex-1 overflow-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
       >
         {messages.map((message, index) => (
-          <div key={index} className="flex gap-3 group">
-            {message.sender === "User" && (
-              <Avatar className="w-8 h-8 rounded-full overflow-hidden border border-white/[0.05] shrink-0">
-                <img
-                  src={"/userlogo.svg"}
-                  alt={"User"}
-                  className="object-cover"
-                />
-              </Avatar>
-            )}
-            <div className="flex-1">
-              <div
-                className={`rounded-lg px-4 py-3 ${
-                  message.sender === "Deplora"
-                    ? "bg-white/[0.02]"
-                    : "bg-white/[0.05]"
-                }`}
-              >
-                <p className="text-sm text-neutral-200 leading-relaxed">
-                  {message.content}
-                </p>
+          <div className="flex-col gap-1" key={index}>
+            <div key={index} className="flex gap-3 group pb-3">
+              {message.sender === "User" && (
+                <Avatar className="w-8 h-8 rounded-full overflow-hidden border border-white/[0.05] shrink-0">
+                  <img
+                    src={"/userlogo.svg"}
+                    alt={"User"}
+                    className="object-cover"
+                  />
+                </Avatar>
+              )}
+              <div className="flex-1">
+                <div
+                  className={`rounded-lg px-4 py-3 ${
+                    message.sender === "Deplora"
+                      ? "bg-white/[0.02]"
+                      : "bg-white/[0.05]"
+                  }`}
+                >
+                  <p className="text-sm text-neutral-300 leading-relaxed">
+                    {message.content}
+                  </p>
+                </div>
               </div>
             </div>
+            {statusMap[message.id] && (
+              <AnimatedStatus statuses={statusMap[message.id]} />
+            )}
           </div>
         ))}
       </div>
@@ -122,7 +129,7 @@ export function Chat() {
                 display: input.length > 0 || isLoraActive ? "flex" : "none",
               }}
               className={`absolute right-2 top-2 h-10 w-10 bg-blue-500 hover:bg-blue-600 text-white`}
-              >
+            >
               {isLoraActive ? (
                 <CircleStop className="h-5 w-5" />
               ) : (

@@ -6,7 +6,11 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { LoraStatus, statusMessages, useMessages } from "../hooks/messages";
 import { Avatar } from "./ui/avatar";
-export function Landing() {
+import AnimatedStatus from "./animated-status";
+import { LampContainer } from "./ui/lamp";
+import { motion } from "framer-motion";
+
+export function LandingChat() {
   const [input, setInput] = useState("");
   const { messages, addMessage, loraStatus } = useMessages();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -52,7 +56,7 @@ export function Landing() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-4 space-y-8">
+    <div className="flex-1 flex flex-col items-center justify-center p-4 space-y-8 min-w-48">
       {messages.length === 0 && (
         <div className="space-y-4 text-center max-w-3xl mx-auto">
           <h1 className="text-4xl sm:text-6xl font-bold text-white">
@@ -98,7 +102,7 @@ export function Landing() {
 
         {showScrollButton && (
           <button
-            className="absolute left-1/2 transform -translate-x-1/2 translate-y-1 bg-blue-500 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg opacity-60 hover:opacity-100 transition-opacity"
+            className="absolute left-1/2 transform -tranneutral-x-1/2 tranneutral-y-1 bg-blue-500 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg opacity-60 hover:opacity-100 transition-opacity"
             onClick={handleScrollToBottom}
             style={{ bottom: "18%" }}
           >
@@ -139,11 +143,11 @@ export function Landing() {
         </form>
         <div className="mt-2 flex items-center justify-center gap-1 text-xs text-neutral-500">
           <span>Use</span>
-          <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-neutral-800 rounded border border-neutral-700">
+          <kbd className="px-1.5 py-0.5 text-[10px] bg-neutral-800 rounded border border-neutral-700">
             Shift
           </kbd>
           <span>+</span>
-          <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-neutral-800 rounded border border-neutral-700">
+          <kbd className="px-1.5 py-0.5 text-[10px] bg-neutral-800 rounded border border-neutral-700">
             Return
           </kbd>
           <span>for a new line</span>
@@ -206,5 +210,25 @@ export function Landing() {
         )}
       </div>
     </div>
+  );
+}
+
+export function Landing() {
+
+  return (
+    <LampContainer>
+      <motion.h1
+        initial={{ opacity: 0.5, y: 100 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.3,
+          duration: 0.8,
+          ease: "easeInOut",
+        }}
+        className="mt-8 bg-gradient-to-br from-neutral-300 to-neutral-500 py-4 bg-clip-text text-4xl font-medium min-w-48 "
+      >
+        <LandingChat />
+      </motion.h1>
+    </LampContainer>
   );
 }

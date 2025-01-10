@@ -37,7 +37,7 @@ export default function RootLayout({
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Button
+                  {/* <Button
                     variant="ghost"
                     size="sm"
                     className="text-neutral-400 hover:text-white"
@@ -45,15 +45,8 @@ export default function RootLayout({
                     <Download className="w-4 h-4 mr-2" />
                     Export
                     <ChevronDown className="w-4 h-4 ml-1" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-neutral-400 hover:text-white"
-                  >
-                    <Zap className="w-4 h-4 mr-2" />
-                    Connect to Supabase
-                  </Button>
+                  </Button> */}
+
                   <Button
                     size="sm"
                     className="bg-blue-500 hover:bg-blue-600 text-white"
@@ -65,7 +58,7 @@ export default function RootLayout({
               </div>
             </header>
 
-            <main className="flex-1 flex min-h-0 overflow-hidden p-6 gap-6">
+            <main className="flex-1 flex min-h-0 overflow-hidden gap-6">
               {children}
             </main>
           </div>
