@@ -1,27 +1,41 @@
 "use client";
 
-import { Chat } from "./components/chat";
-import { CodeEditor } from "./components/CodeEditor/CodeEditor";
-import { Landing } from "./components/landing";
-import { ResizablePanel } from "./components/resizable-panel";
+import { useEffect, useState } from "react";
+
+import { Landing, LandingChat } from "./components/landing";
+import { useRouter } from 'next/navigation'
+
 import { LoraStatus, useMessages } from "./hooks/messages";
+import { redirect } from 'next/navigation'
 
 export default function Home() {
-  const { loraStatus, fileContent } = useMessages();
+  const { loraStatus, fileContent, session_id } = useMessages();
+  const [hasFiles, setHasFiles] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const router = useRouter();
 
-  if (
-    Object.keys(fileContent).length === 0 ||
-    loraStatus === LoraStatus.GATHERING_DATA
-  ) {
+
+  useEffect(() => {
+    if (loraStatus === LoraStatus.STARTING) {
+      setIsChatOpen(true);
+    }
+  }, [loraStatus]);
+
+  useEffect(() => {
+    if (Object.keys(fileContent).length > 0) {
+      setHasFiles(true);
+    }
+  }, [fileContent]);
+
+  if (isChatOpen && !hasFiles) {
+    return <LandingChat />;
+  }
+
+  if (!hasFiles) {
     return <Landing />;
   }
 
-  return (
-    <div className="flex-1 flex min-h-0">
-      <ResizablePanel>
-        <Chat />
-      </ResizablePanel>
-      <CodeEditor />
-    </div>
-  );
+  // navigate to /chat/session_id
+
+  redirect(`chat/${session_id}`);
 }
