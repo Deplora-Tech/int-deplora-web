@@ -1,16 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Chat } from "./components/chat";
-import { CodeEditor } from "./components/CodeEditor/CodeEditor";
+
 import { Landing, LandingChat } from "./components/landing";
-import { ResizablePanel } from "./components/resizable-panel";
+import { useRouter } from 'next/navigation'
+
 import { LoraStatus, useMessages } from "./hooks/messages";
+import { redirect } from 'next/navigation'
 
 export default function Home() {
-  const { loraStatus, fileContent } = useMessages();
+  const { loraStatus, fileContent, session_id } = useMessages();
   const [hasFiles, setHasFiles] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const router = useRouter();
 
 
   useEffect(() => {
@@ -33,12 +35,7 @@ export default function Home() {
     return <Landing />;
   }
 
-  return (
-    <div className="flex-1 flex min-h-0 p-4">
-      <ResizablePanel>
-        <Chat />
-      </ResizablePanel>
-      <CodeEditor />
-    </div>
-  );
+  // navigate to /chat/session_id
+
+  redirect(`chat/${session_id}`);
 }

@@ -1,12 +1,11 @@
-import type React from "react";
-import {
+import React, {
   createContext,
   useContext,
   useEffect,
   useRef,
   useState,
 } from "react";
-import { sendMessage } from "../api/api";
+import { sendMessage, load_conv } from "../api/api";
 import { v4 } from "uuid";
 
 export enum LoraStatus {
@@ -27,8 +26,7 @@ export const statusMessages: Record<LoraStatus, string> = {
   [LoraStatus.RETRIEVING_USER_PREFERENCES]: "Retrieving user preferences...",
   [LoraStatus.RETRIEVING_PROJECT_DETAILS]: "Fetching project details...",
   [LoraStatus.GENERATING_DEPLOYMENT_PLAN]: "Generating the deployment plan...",
-  [LoraStatus.GENERATED_DEPLOYMENT_PLAN]:
-    "Deployment plan generated successfully!",
+  [LoraStatus.GENERATED_DEPLOYMENT_PLAN]: "Deployment plan generated successfully!",
   [LoraStatus.GATHERING_DATA]: "Gathering additional data...",
   [LoraStatus.COMPLETED]: "Process completed successfully!",
   [LoraStatus.FAILED]: "Something went wrong. Please try again.",
@@ -42,6 +40,11 @@ type Message = {
   userId: number;
 };
 
+interface MessageHistory {
+  chat_history: { role: string; message: string }[];
+  current_plan: Record<string, string>;
+}
+
 interface MessageContextType {
   messages: Message[];
   addMessage: (message: Omit<Message, "id">) => void;
@@ -51,6 +54,8 @@ interface MessageContextType {
   fileContent: Record<string, string>;
   setFileContent: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   loraStatus?: LoraStatus;
+  setMessageHistory: (session_id: string) => void;
+  session_id: string; // Add session_id to the context type
 }
 
 const MessageContext = createContext<MessageContextType | undefined>(undefined);
@@ -112,7 +117,6 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         project_id: "1",
         organization_id: "1",
         session_id: session_id,
-
       });
 
       const messageContent = reply.processed_message.response;
@@ -133,14 +137,12 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         setFileContent(fileContents);
       }
       updateMessageStatus(LoraStatus.COMPLETED);
-
     } catch (error) {
       console.error("Error sending message:", error);
       updateMessageStatus(LoraStatus.FAILED);
     }
   };
 
-  // Update the status of the current message
   const updateMessageStatus = (status: LoraStatus) => {
     if (!currentMessageId) return;
     console.log("Updating message status:", status);
@@ -154,8 +156,26 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("Status map:", statusMap);
 
     if (status === LoraStatus.COMPLETED || status === LoraStatus.FAILED) {
-      setCurrentMessageId(null); // Reset the current message after completion
+      setCurrentMessageId(null);
     }
+  };
+
+  const setMessageHistory = (session_id: string) => {
+    setSessionId(session_id);
+
+    load_conv(session_id).then(({ chat_history, current_plan }) => {
+      const formattedMessages: Message[] = chat_history.map((chat) => ({
+        id: crypto.randomUUID(),
+        content: chat.message,
+        sender: chat.role === "You" ? "Deplora" : "User",
+        timestamp: new Date(),
+        userId: 1,
+      }));
+
+      setMessages(formattedMessages);
+      setFileContent(current_plan);
+    });
+
   };
 
   return (
@@ -169,6 +189,8 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         fileContent,
         setFileContent,
         loraStatus,
+        setMessageHistory,
+        session_id, // Include session_id in the context value
       }}
     >
       {children}
