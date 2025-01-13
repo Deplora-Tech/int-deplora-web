@@ -1,4 +1,5 @@
 export const detectFileType = (fileName: string) => {
+  if (!fileName) return "plaintext";
   if (fileName.endsWith(".json")) return "json";
   if (fileName.endsWith(".tf")) return "terraform";
   if (fileName === "Dockerfile") return "dockerfile";
