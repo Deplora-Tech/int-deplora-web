@@ -83,10 +83,9 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
 
     websocket.onmessage = (event) => {
       console.log("WebSocket message received:", event.data);
-
+      
       if (event.data in LoraStatus) {
         setLoraStatus(event.data);
-        updateMessageStatus(event.data);
       }
     };
 
