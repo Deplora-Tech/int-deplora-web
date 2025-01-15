@@ -72,7 +72,7 @@ export default function RootLayout({
                   >
                     <ArrowUpRight className="w-4 h-4 mr-2" />
                     Deploy
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </header>

@@ -40,11 +40,9 @@ export function ChatHistorySidebar({
     >
       <div className="px-6 pt-6 bg-gradient-to-r from-black/40 via-[#01010101] to-black/40 backdrop-blur-md">
         <div className="flex items-center gap-4">
-          <Clock className="w-5 h-5 text-blue-400" />
+          <Clock className="w-5 h-5 text-white/80" />
           <div>
-            <h2 className="text-xl font-bold bg-gradient-to-r from-blue-700 to-teal-500 bg-clip-text text-transparent">
-              Recent Chats
-            </h2>
+            <h2 className="text-xl font-bold  text-white/80 ">Recent Chats</h2>
           </div>
         </div>
       </div>
