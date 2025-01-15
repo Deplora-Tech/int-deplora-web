@@ -47,13 +47,13 @@ export default function RootLayout({
                     <ChevronDown className="w-4 h-4 ml-1" />
                   </Button> */}
 
-                  <Button
+                  {/* <Button
                     size="sm"
                     className="bg-blue-500 hover:bg-blue-600 text-white"
                   >
                     <ArrowUpRight className="w-4 h-4 mr-2" />
                     Deploy
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </header>
