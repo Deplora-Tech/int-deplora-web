@@ -5,7 +5,7 @@ import PipelineDashboard from "../PipelineDashboard/PipelineDashboard";
 export function FooterActions() {
   return (
     <div className="px-2 flex items-center justify-between border-t border-white/[0.02]">
-      <PipelineDashboard />
+      {/* <PipelineDashboard /> */}
     </div>
   );
 }

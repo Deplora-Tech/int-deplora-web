@@ -33,7 +33,7 @@ export const sendMessage = async (
 
 export const load_conv = async (session_id: string) => {
 	const response = await api.get(
-		`/get_chat_history/${session_id}`,
+		`/get-chat-history/${session_id}`,
 	);
 	return response.data;
 };

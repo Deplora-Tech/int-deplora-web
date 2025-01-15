@@ -90,6 +90,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loraStatus, setLoraStatus] = useState<LoraStatus | undefined>();
   const websocketRef = useRef<WebSocket | null>(null);
   const [session_id, setSessionId] = useState<string>(v4());
+  const [pipelineStatus, setPipelineStatus] = useState<string>("");
 
   console.log("Session ID:", session_id);
 
@@ -102,10 +103,18 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     websocket.onmessage = (event) => {
-      console.log("WebSocket message received:", event.data);
-      
-      if (event.data in LoraStatus) {
-        setLoraStatus(event.data);
+      console.log("WebSocket message rece ived:", event.data);
+
+      const res = JSON.parse(event.data)
+      console.log("Res:", res);
+
+      if (Object.values(ExcecutionStatus).includes(res.status)) {
+        console.log("Graph status:", res.data);
+      }
+
+      if (Object.values(LoraStatus).includes(res.status)) {
+        setLoraStatus(res.status);
+        console.log("Lora status:", res.status);
       }
     };
 

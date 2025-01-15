@@ -69,7 +69,7 @@ export default function PipelineDashboard() {
   const estimatedTimeRemaining = pipeline.estimatedDuration - elapsedTime;
 
   return (
-    <Card className="w-full max-w-4xl mx-auto bg-gray-950 text-white border-gray-800">
+    <Card className="w-full max-w-4xl mx-auto bg-gray-950 text-white border-gray-800 max-h-full">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">
           CI Pipeline Dashboard
