@@ -8,16 +8,36 @@ import React, {
 import { sendMessage, load_conv } from "../api/api";
 import { v4 } from "uuid";
 
+export enum DeploymentOptions {
+  DOCKERIZED_DEPLOYMENT = "Dockerized Deployments (Containerization)",
+  KUBERNETES_DEPLOYMENT = "Kubernetes-Orchestrated Deployment",
+  VM_DEPLOYMENT = "MI/VM Image-Based Deployment",
+}
+
 export enum LoraStatus {
-  STARTING = "STARTING",
-  INTENT_DETECTED = "INTENT_DETECTED",
-  RETRIEVING_USER_PREFERENCES = "RETRIEVING_USER_PREFERENCES",
-  RETRIEVING_PROJECT_DETAILS = "RETRIEVING_PROJECT_DETAILS",
-  GENERATING_DEPLOYMENT_PLAN = "GENERATING_DEPLOYMENT_PLAN",
-  GENERATED_DEPLOYMENT_PLAN = "GENERATED_DEPLOYMENT_PLAN",
-  GATHERING_DATA = "GATHERING_DATA",
-  COMPLETED = "COMPLETED",
-  FAILED = "FAILED",
+  STARTING = "LORASTATUS_STARTING",
+  INTENT_DETECTED = "LORASTATUS_INTENT_DETECTED",
+  RETRIEVING_USER_PREFERENCES = "LORASTATUS_RETRIEVING_USER_PREFERENCES",
+  RETRIEVING_PROJECT_DETAILS = "LORASTATUS_RETRIEVING_PROJECT_DETAILS",
+  GENERATING_DEPLOYMENT_PLAN = "LORASTATUS_GENERATING_PLAN",
+  GENERATED_DEPLOYMENT_PLAN = "LORASTATUS_GENERATED_PLAN",
+  FAILED = "LORASTATUS_FAILED",
+  COMPLETED = "LORASTATUS_COMPLETED",
+  GATHERING_DATA = "LORASTATUS_GATHERING_DATA",
+}
+
+export enum GraphStatus {
+  INITIALIZE = "GRAPHSTATUS_INITIALIZE",
+  COMPLETED = "GRAPHSTATUS_COMPLETED",
+  FAILED = "GRAPHSTATUS_FAILED",
+}
+
+export enum ExcecutionStatus {
+  INITIALIZE = "EXCECUTION_INITIALIZE",
+  PROCESSING = "EXCECUTION_PROCESSING",
+  WAITING_FOR_INPUT = "EXCECUTION_WAITING_FOR_INPUT",
+  COMPLETED = "EXCECUTION_COMPLETED",
+  FAILED = "EXCECUTION_FAILED",
 }
 
 export const statusMessages: Record<LoraStatus, string> = {
@@ -83,10 +103,9 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
 
     websocket.onmessage = (event) => {
       console.log("WebSocket message received:", event.data);
-
+      
       if (event.data in LoraStatus) {
         setLoraStatus(event.data);
-        updateMessageStatus(event.data);
       }
     };
 
