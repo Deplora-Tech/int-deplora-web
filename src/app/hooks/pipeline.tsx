@@ -31,6 +31,7 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
             };
 
             websocket.onmessage = (event) => {
+                console.log("Pipeline event data:", event.data);
                 const res = JSON.parse(event.data);
 
                 if (Object.values(ExcecutionStatus).includes(res.status)) {
@@ -39,7 +40,7 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
 
                 if (res.status === ExcecutionStatus.INITIALIZE) {
                     let data = JSON.parse(res.data);
-                    data["currentStage"] = 0;
+                    data["currentStage"] = data.stages.length;
                     setPipelineData(data);
                     console.log("Pipeline dataaaa:", data);
                 }

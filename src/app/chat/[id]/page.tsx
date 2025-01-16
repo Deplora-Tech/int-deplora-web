@@ -14,6 +14,7 @@ const Page = () => {
   const { fileContent, setMessageHistory } = useMessages();
   const [hasFiles, setHasFiles] = useState(false);
   const params = useParams();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const { id } = params;
@@ -27,7 +28,6 @@ const Page = () => {
     }
   }, [fileContent]);
 
-  const [isModalOpen, setIsModalOpen] = useState(true);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
