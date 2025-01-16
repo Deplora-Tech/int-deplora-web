@@ -38,6 +38,8 @@ export function ChatHistorySidebar({
         className
       )}
     >
+      <div className="absolute inset-0 bg-cyan-500/10 blur-3xl rounded-full" />
+
       <div className="px-6 pt-6 bg-gradient-to-r from-black/40 via-[#01010101] to-black/40 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <Clock className="w-5 h-5 text-white/80" />
