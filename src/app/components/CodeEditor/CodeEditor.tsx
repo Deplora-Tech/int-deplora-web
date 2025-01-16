@@ -221,7 +221,7 @@ export function CodeEditor({ setIsModalOpen }: { setIsModalOpen: React.Dispatch<
             />
           </div>
         </TabsContent>
-        <TabsContent value="preview" className="flex-1 mt-0">
+        <TabsContent value="preview" className="flex-1 mt-0 max-h-[76vh] overflow-auto ">
           <PreviewContent />
         </TabsContent>
       </Tabs>

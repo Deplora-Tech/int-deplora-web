@@ -50,6 +50,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       if (Object.values(GraphStatus).includes(res.status)) {
+        console.log("Graph status:", res.data);
         const graph = JSON.parse(res.data);
         setGraph(graph);
       }

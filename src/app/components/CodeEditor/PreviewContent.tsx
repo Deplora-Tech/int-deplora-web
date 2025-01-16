@@ -14,7 +14,7 @@ export default function PreviewContent() {
       {imageUrl ? (
         <img src={imageUrl} alt="Graph" className="w-full object-contain" />
       ) : (
-        <div className="flex flex-1 items-center justify-center">
+        <div className="flex flex-1 items-center justify-center h-full w-full">
           <span className="text-neutral-500">No graph to display</span>
         </div>
       )}
