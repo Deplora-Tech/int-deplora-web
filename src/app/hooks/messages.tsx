@@ -7,7 +7,12 @@ import React, {
 } from "react";
 import { sendMessage, load_conv } from "../api/api";
 import { v4 } from "uuid";
-import { LoraStatus, ExcecutionStatus } from "../constants/Enums";
+import {
+  LoraStatus,
+  ExcecutionStatus,
+  GraphStatus,
+  GraphType,
+} from "../constants/Enums";
 import type { Message, MessageContextType } from "../types/MessageTypes";
 
 const MessageContext = createContext<MessageContextType | undefined>(undefined);
@@ -22,6 +27,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const [loraStatus, setLoraStatus] = useState<LoraStatus | undefined>();
   const [session_id, setSessionId] = useState<string>(v4());
   const websocketRef = useRef<WebSocket | null>(null);
+  const [graph, setGraph] = useState<GraphType | null>(null);
 
   useEffect(() => {
     const websocket = new WebSocket(`${process.env.NEXT_PUBLIC_API_URL}/ws/1`);
@@ -41,6 +47,12 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       if (Object.values(LoraStatus).includes(res.status)) {
         setLoraStatus(res.status);
         console.log("Lora status:", res.status);
+      }
+
+      if (Object.values(GraphStatus).includes(res.status)) {
+        console.log("Graph status:", res.data);
+        const graph = JSON.parse(res.data);
+        setGraph(graph);
       }
     };
 
@@ -116,7 +128,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     setSessionId(session_id);
 
     load_conv(session_id).then(({ chat_history, current_plan }) => {
-      const formattedMessages: Message[] = chat_history.map((chat) => ({
+      const formattedMessages: Message[] = chat_history.map((chat: any) => ({
         id: crypto.randomUUID(),
         content: chat.message,
         sender: chat.role === "You" ? "Deplora" : "User",
@@ -142,6 +154,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         loraStatus,
         setMessageHistory,
         session_id,
+        graph,
       }}
     >
       {children}

@@ -29,6 +29,12 @@ export enum DeploymentOptions {
     COMPLETED = "EXCECUTION_COMPLETED",
     FAILED = "EXCECUTION_FAILED",
   }
+
+  export type GraphType = {
+    content_type: string;
+    image_data: string;
+    filename: string;
+  };
   
 
   export const statusMessages: Record<LoraStatus, string> = {
