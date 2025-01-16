@@ -41,11 +41,12 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       const res = JSON.parse(event.data);
 
       if (Object.values(ExcecutionStatus).includes(res.status)) {
-        console.log("Graph status:", res.data);
+        console.log("Pipeline status:", res.data);
       }
 
       if (Object.values(LoraStatus).includes(res.status)) {
         setLoraStatus(res.status);
+        console.log("Lora status:", res.status);
       }
 
       if (Object.values(GraphStatus).includes(res.status)) {

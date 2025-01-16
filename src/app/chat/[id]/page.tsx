@@ -37,7 +37,7 @@ const Page = () => {
     <div className="flex-1 flex min-h-0 p-4">
       {isModalOpen && (
         <div
-          className="fixed bg-blue-700 p-40 bg-opacity-50 flex items-center justify-center z-50 w-full max-h-[50dvh]"
+          className="fixed p-40 bg-opacity-50 flex items-center justify-center z-50 w-full max-h-[50dvh]"
           onClick={handleCloseModal} // Close modal on background click
           onKeyUp={(e) => {
             if (e.key === 'Escape') {
