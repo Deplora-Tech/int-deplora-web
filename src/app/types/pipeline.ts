@@ -1,4 +1,4 @@
-export type StageStatus = 'completed' | 'in-progress' | 'pending' | 'failed'
+export type StageStatus = "SUCCESS" | "IN_PROGRESS" | "pending" | "FAILED";
 
 export interface Stage {
   id: string
