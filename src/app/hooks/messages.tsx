@@ -183,7 +183,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     setSessionId(session_id);
 
     load_conv(session_id).then(({ chat_history, current_plan }) => {
-      const formattedMessages: Message[] = chat_history.map((chat) => ({
+      const formattedMessages: Message[] = chat_history.map((chat: { role: string; message: string }): Message => ({
         id: crypto.randomUUID(),
         content: chat.message,
         sender: chat.role === "You" ? "Deplora" : "User",

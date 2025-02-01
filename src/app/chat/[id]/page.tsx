@@ -13,9 +13,15 @@ const Page = () => {
 
     useEffect(() => {
         const { id } = params;
-        setMessageHistory(id);
-        console.log("SETTING MESSAGE HISTORY");
+    
+        if (typeof id === "string") {
+            setMessageHistory(id);
+            console.log("SETTING MESSAGE HISTORY");
+        } else {
+            console.error("Invalid ID:", id);
+        }
     }, [params]);
+    
 
     useEffect(() => {
         if (fileContent && Object.keys(fileContent).length > 0) {
