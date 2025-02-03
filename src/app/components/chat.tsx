@@ -1,8 +1,8 @@
 "use client";
 
-import { Avatar } from "@/app/components/ui/avatar";
-import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
+import { Avatar } from "./ui/avatar";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import {
   ArrowDown,
   ArrowRight,

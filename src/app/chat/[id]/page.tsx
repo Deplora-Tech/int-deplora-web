@@ -11,58 +11,38 @@ import PipelineDashboard from "../../components/PipelineDashboard/PipelineDashbo
 
 
 const Page = () => {
-  const { fileContent, setMessageHistory } = useMessages();
-  const [hasFiles, setHasFiles] = useState(false);
-  const params = useParams();
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  useEffect(() => {
-    const { id } = params;
-    setMessageHistory(id);
-    console.log("SETTING MESSAGE HISTORY");
-  }, [params]);
+    const { fileContent, setMessageHistory } = useMessages();
+    const [hasFiles, setHasFiles] = useState(false);
+    const params = useParams();
 
-  useEffect(() => {
-    if (fileContent && Object.keys(fileContent).length > 0) {
-      setHasFiles(true);
-    }
-  }, [fileContent]);
+    useEffect(() => {
+        const { id } = params;
+    
+        if (typeof id === "string") {
+            setMessageHistory(id);
+            console.log("SETTING MESSAGE HISTORY");
+        } else {
+            console.error("Invalid ID:", id);
+        }
+    }, [params]);
+    
+
+    useEffect(() => {
+        if (fileContent && Object.keys(fileContent).length > 0) {
+            setHasFiles(true);
+        }
+    }, [fileContent]);
 
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
 
-  return (
-    <div className="flex-1 flex min-h-0 p-4">
-      {isModalOpen && (
-        <div
-          className="fixed p-40 bg-opacity-50 flex items-center justify-center z-50 w-full max-h-[50dvh]"
-          onClick={handleCloseModal} // Close modal on background click
-          onKeyUp={(e) => {
-            if (e.key === 'Escape') {
-              handleCloseModal();
-            }
-          }}
-        >
-          <div
-            className="bg-neutral-100 rounded-lg p-4 max-w-lg w-full"
-            onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') {
-                handleCloseModal();
-              }
-            }}
-          >
-            <PipelineDashboard />
-            <Button
-              size="sm"
-              className="mt-4 bg-red-500 hover:bg-red-600 text-white"
-              onClick={handleCloseModal}
-            >
-              Close
-            </Button>
-          </div>
+    return (
+        <div className="flex-1 flex min-h-0 p-4">
+            <ResizablePanel>
+                <Chat />
+            </ResizablePanel>
+            {hasFiles? <CodeEditor /> : null}
+
         </div>
       )}
       <ResizablePanel>

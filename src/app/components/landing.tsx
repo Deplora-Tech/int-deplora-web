@@ -87,7 +87,7 @@ export function LandingChat() {
                 )}
                 <div
                   className={`flex-1 rounded-lg px-4 py-3 ${
-                    message.sender === "Bot"
+                    message.sender === "Deplora"
                       ? "bg-white/[0.02]"
                       : "bg-white/[0.05]"
                   }`}

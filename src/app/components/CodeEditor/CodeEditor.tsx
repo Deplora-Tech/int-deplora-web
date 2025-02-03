@@ -1,7 +1,7 @@
 "use client";
 
-import { ScrollArea } from "@/app/components/ui/scroll-area";
-import { Tabs, TabsContent } from "@/app/components/ui/tabs";
+import { ScrollArea } from "../ui/scroll-area";
+import { Tabs, TabsContent } from "../ui/tabs";
 import { ChevronDown, FileIcon, FolderIcon } from "lucide-react";
 import { detectFileType } from "../../lib/editor";
 import Editor from "react-simple-code-editor";
@@ -11,7 +11,7 @@ import "prismjs/components/prism-javascript";
 import "prismjs/themes/prism.css";
 import { TabsHeader } from "./TabHeader";
 import { FooterActions } from "./FooterActions";
-import { useMessages } from "@/app/hooks/messages";
+import { useMessages } from "../../../app/hooks/messages";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import PreviewContent from "./PreviewContent";
