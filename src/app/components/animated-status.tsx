@@ -4,7 +4,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, CheckCircle2, XCircle } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
-import { LoraStatus, statusMessages } from "../hooks/messages";
+import { LoraStatus, statusMessages } from "../constants/Enums";
 
 interface AnimatedStatusProps {
   statuses: LoraStatus[];

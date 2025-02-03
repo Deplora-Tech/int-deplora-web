@@ -7,76 +7,13 @@ import React, {
 } from "react";
 import { sendMessage, load_conv } from "../api/api";
 import { v4 } from "uuid";
-
-export enum DeploymentOptions {
-  DOCKERIZED_DEPLOYMENT = "Dockerized Deployments (Containerization)",
-  KUBERNETES_DEPLOYMENT = "Kubernetes-Orchestrated Deployment",
-  VM_DEPLOYMENT = "MI/VM Image-Based Deployment",
-}
-
-export enum LoraStatus {
-  STARTING = "LORASTATUS_STARTING",
-  INTENT_DETECTED = "LORASTATUS_INTENT_DETECTED",
-  RETRIEVING_USER_PREFERENCES = "LORASTATUS_RETRIEVING_USER_PREFERENCES",
-  RETRIEVING_PROJECT_DETAILS = "LORASTATUS_RETRIEVING_PROJECT_DETAILS",
-  GENERATING_DEPLOYMENT_PLAN = "LORASTATUS_GENERATING_PLAN",
-  GENERATED_DEPLOYMENT_PLAN = "LORASTATUS_GENERATED_PLAN",
-  FAILED = "LORASTATUS_FAILED",
-  COMPLETED = "LORASTATUS_COMPLETED",
-  GATHERING_DATA = "LORASTATUS_GATHERING_DATA",
-}
-
-export enum GraphStatus {
-  INITIALIZE = "GRAPHSTATUS_INITIALIZE",
-  COMPLETED = "GRAPHSTATUS_COMPLETED",
-  FAILED = "GRAPHSTATUS_FAILED",
-}
-
-export enum ExcecutionStatus {
-  INITIALIZE = "EXCECUTION_INITIALIZE",
-  PROCESSING = "EXCECUTION_PROCESSING",
-  WAITING_FOR_INPUT = "EXCECUTION_WAITING_FOR_INPUT",
-  COMPLETED = "EXCECUTION_COMPLETED",
-  FAILED = "EXCECUTION_FAILED",
-}
-
-export const statusMessages: Record<LoraStatus, string> = {
-  [LoraStatus.STARTING]: "Starting the process...",
-  [LoraStatus.INTENT_DETECTED]: "Intent detected! Analyzing further...",
-  [LoraStatus.RETRIEVING_USER_PREFERENCES]: "Retrieving user preferences...",
-  [LoraStatus.RETRIEVING_PROJECT_DETAILS]: "Fetching project details...",
-  [LoraStatus.GENERATING_DEPLOYMENT_PLAN]: "Generating the deployment plan...",
-  [LoraStatus.GENERATED_DEPLOYMENT_PLAN]: "Deployment plan generated successfully!",
-  [LoraStatus.GATHERING_DATA]: "Gathering additional data...",
-  [LoraStatus.COMPLETED]: "Process completed successfully!",
-  [LoraStatus.FAILED]: "Something went wrong. Please try again.",
-};
-
-type Message = {
-  id: string;
-  content: string;
-  sender: "User" | "Deplora";
-  timestamp: Date;
-  userId: number;
-};
-
-interface MessageHistory {
-  chat_history: { role: string; message: string }[];
-  current_plan: Record<string, string>;
-}
-
-interface MessageContextType {
-  messages: Message[];
-  addMessage: (message: Omit<Message, "id">) => void;
-  updateMessageStatus: (status: LoraStatus) => void;
-  statusMap: Record<string, LoraStatus[]>;
-  currentMessageId: string | null;
-  fileContent: Record<string, string>;
-  setFileContent: React.Dispatch<React.SetStateAction<Record<string, string>>>;
-  loraStatus?: LoraStatus;
-  setMessageHistory: (session_id: string) => void;
-  session_id: string; // Add session_id to the context type
-}
+import {
+  LoraStatus,
+  ExcecutionStatus,
+  GraphStatus,
+  GraphType,
+} from "../constants/Enums";
+import type { Message, MessageContextType } from "../types/MessageTypes";
 
 const MessageContext = createContext<MessageContextType | undefined>(undefined);
 
@@ -88,10 +25,9 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const [fileContent, setFileContent] = useState<Record<string, string>>({});
   const [messages, setMessages] = useState<Message[]>([]);
   const [loraStatus, setLoraStatus] = useState<LoraStatus | undefined>();
-  const websocketRef = useRef<WebSocket | null>(null);
   const [session_id, setSessionId] = useState<string>(v4());
-
-  console.log("Session ID:", session_id);
+  const websocketRef = useRef<WebSocket | null>(null);
+  const [graph, setGraph] = useState<GraphType | null>(null);
 
   useEffect(() => {
     const websocket = new WebSocket(`${process.env.NEXT_PUBLIC_API_URL}/ws/1`);
@@ -102,10 +38,21 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     };
 
     websocket.onmessage = (event) => {
-      console.log("WebSocket message received:", event.data);
-      
-      if (event.data in LoraStatus) {
-        setLoraStatus(event.data);
+      const res = JSON.parse(event.data);
+
+      if (Object.values(ExcecutionStatus).includes(res.status)) {
+        console.log("Pipeline status:", res.data);
+      }
+
+      if (Object.values(LoraStatus).includes(res.status)) {
+        setLoraStatus(res.status);
+        console.log("Lora status:", res.status);
+      }
+
+      if (Object.values(GraphStatus).includes(res.status)) {
+        console.log("Graph status:", res.data);
+        const graph = JSON.parse(res.data);
+        setGraph(graph);
       }
     };
 
@@ -151,10 +98,10 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       ]);
 
       const fileContents = reply.processed_message.file_contents;
-
       if (fileContents && Object.entries(fileContents).length > 0) {
         setFileContent(fileContents);
       }
+
       updateMessageStatus(LoraStatus.COMPLETED);
     } catch (error) {
       console.error("Error sending message:", error);
@@ -164,7 +111,6 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const updateMessageStatus = (status: LoraStatus) => {
     if (!currentMessageId) return;
-    console.log("Updating message status:", status);
     setStatusMap((prev) => {
       const currentStatuses = prev[currentMessageId] || [];
       return {
@@ -172,7 +118,6 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         [currentMessageId]: [...currentStatuses, status],
       };
     });
-    console.log("Status map:", statusMap);
 
     if (status === LoraStatus.COMPLETED || status === LoraStatus.FAILED) {
       setCurrentMessageId(null);
@@ -183,7 +128,9 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     setSessionId(session_id);
 
     load_conv(session_id).then(({ chat_history, current_plan }) => {
+
       const formattedMessages: Message[] = chat_history.map((chat: { role: string; message: string }): Message => ({
+
         id: crypto.randomUUID(),
         content: chat.message,
         sender: chat.role === "You" ? "Deplora" : "User",
@@ -194,7 +141,6 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       setMessages(formattedMessages);
       setFileContent(current_plan);
     });
-
   };
 
   return (
@@ -209,7 +155,8 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         setFileContent,
         loraStatus,
         setMessageHistory,
-        session_id, // Include session_id in the context value
+        session_id,
+        graph,
       }}
     >
       {children}

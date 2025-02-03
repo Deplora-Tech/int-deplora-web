@@ -16,6 +16,7 @@ import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import PreviewContent from "./PreviewContent";
 
+
 type FileTree = {
   [key: string]: FileTree | string;
 };
@@ -191,16 +192,17 @@ function EditorContent({
   );
 }
 
-export function CodeEditor() {
+export function CodeEditor({ setIsModalOpen }: { setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
   const { fileContent, setFileContent } = useMessages();
   const [selectedFile, setSelectedFile] = useState(
     Object.keys(fileContent)[0] as keyof typeof fileContent
   );
+  
 
   return (
     <div className="gradient-border flex-1 flex flex-col min-w-0 h-[80vh]">
       <Tabs defaultValue="code" className="flex-1 flex flex-col h-[76vh]">
-        <TabsHeader />
+        <TabsHeader setIsModalOpen={setIsModalOpen} />
         <div className="absolute top-0 right-10 h-[0.6px] w-full bg-gradient-to-r from-transparent via-blue-500 via-50% via-teal-400 to-transparent" />
         <TabsContent value="code" className="flex-1 p-0 mt-0 h-[76vh]">
           <div className="flex h-full divide-x divide-white/[0.02]">
@@ -219,11 +221,13 @@ export function CodeEditor() {
             />
           </div>
         </TabsContent>
-        <TabsContent value="preview" className="flex-1 mt-0">
+        <TabsContent value="preview" className="flex-1 mt-0 max-h-[76vh] overflow-auto ">
           <PreviewContent />
         </TabsContent>
       </Tabs>
       <FooterActions />
+
+      
     </div>
   );
 }

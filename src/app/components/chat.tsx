@@ -11,7 +11,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { LoraStatus, useMessages } from "../hooks/messages";
+import { useMessages } from "../hooks/messages";
+import { LoraStatus } from "../constants/Enums";
 import AnimatedStatus from "./animated-status";
 
 export function Chat() {

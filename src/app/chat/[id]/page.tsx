@@ -4,9 +4,14 @@ import { Chat } from "../../components/chat";
 import { CodeEditor } from "../../components/CodeEditor/CodeEditor";
 import { ResizablePanel } from "../../components/resizable-panel";
 import { useMessages } from "../../hooks/messages";
-import {  useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
+
+import { Button } from "../../components/ui/button";
+import PipelineDashboard from "../../components/PipelineDashboard/PipelineDashboard";
+
 
 const Page = () => {
+
     const { fileContent, setMessageHistory } = useMessages();
     const [hasFiles, setHasFiles] = useState(false);
     const params = useParams();
@@ -37,8 +42,17 @@ const Page = () => {
                 <Chat />
             </ResizablePanel>
             {hasFiles? <CodeEditor /> : null}
+
         </div>
-    );
+      )}
+      <ResizablePanel>
+        <Chat />
+      </ResizablePanel>
+      {hasFiles ? <CodeEditor setIsModalOpen={setIsModalOpen} /> : null}
+
+
+    </div>
+  );
 }
 
 export default Page;

@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { Landing, LandingChat } from "./components/landing";
 import { useRouter } from 'next/navigation'
 
-import { LoraStatus, useMessages } from "./hooks/messages";
+import {  useMessages } from "./hooks/messages";
+import { LoraStatus, statusMessages } from "./constants/Enums";
 import { redirect } from 'next/navigation'
 
 export default function Home() {
