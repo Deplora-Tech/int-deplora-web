@@ -30,7 +30,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const [graph, setGraph] = useState<GraphType | null>(null);
 
   useEffect(() => {
-    const websocket = new WebSocket(`${process.env.NEXT_PUBLIC_API_URL}/ws/1`);
+    const websocket = new WebSocket(`${process.env.NEXT_PUBLIC_API_URL}/ws/${session_id}`);
     websocketRef.current = websocket;
 
     websocket.onopen = () => {

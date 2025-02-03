@@ -4,17 +4,14 @@ import { Chat } from "../../components/chat";
 import { CodeEditor } from "../../components/CodeEditor/CodeEditor";
 import { ResizablePanel } from "../../components/resizable-panel";
 import { useMessages } from "../../hooks/messages";
-import { useParams } from 'next/navigation';
-
-import { Button } from "../../components/ui/button";
-import PipelineDashboard from "../../components/PipelineDashboard/PipelineDashboard";
-
+import {  useParams } from 'next/navigation';
+import PipelineDashboard from "../../components/PipelineDashboard/PipelineDashboard"
 
 const Page = () => {
-
     const { fileContent, setMessageHistory } = useMessages();
     const [hasFiles, setHasFiles] = useState(false);
     const params = useParams();
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const { id } = params;
@@ -41,18 +38,10 @@ const Page = () => {
             <ResizablePanel>
                 <Chat />
             </ResizablePanel>
-            {hasFiles? <CodeEditor /> : null}
-
+            {hasFiles ? <CodeEditor setIsModalOpen={setIsModalOpen} /> : null}
+            {isModalOpen ? <PipelineDashboard /> : null}
         </div>
-      )}
-      <ResizablePanel>
-        <Chat />
-      </ResizablePanel>
-      {hasFiles ? <CodeEditor setIsModalOpen={setIsModalOpen} /> : null}
-
-
-    </div>
-  );
+    );
 }
 
 export default Page;
