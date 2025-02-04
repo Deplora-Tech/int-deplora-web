@@ -5,6 +5,7 @@ import "./globals.css";
 import { Button } from "./components/ui/button";
 import { MessageProvider } from "./hooks/messages";
 import { PipelineProvider } from "./hooks/pipeline"
+import {SessionProvider} from "./hooks/session"
 
 export default function RootLayout({
   children,
@@ -13,6 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
+      <SessionProvider>
       <MessageProvider>
         <PipelineProvider>
           <body className="min-h-screen flex flex-col bg-[#011521] text-white overflow-hidden">
@@ -93,6 +95,7 @@ export default function RootLayout({
           </body>
         </PipelineProvider>
       </MessageProvider>
+      </SessionProvider>
     </html>
   );
 }

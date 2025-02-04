@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { ExcecutionStatus } from "../constants/Enums";
 import type { PipelineData, PipelineContextType } from "../types/PipelineTypes";
-import { useMessages } from "./messages";
+import { useSession } from "./session";
 
 const PipelineContext = createContext<PipelineContextType | undefined>(
     undefined
@@ -19,9 +19,12 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
     const [pipelineData, setPipelineData] = useState<PipelineData | null>(null);
     const websocketRef = useRef<WebSocket | null>(null);
 
-    const { session_id } = useMessages();
+    const { session_id } = useSession();
 
     useEffect(() => {
+
+        if (!session_id) return;
+        
         try {
             const websocket = new WebSocket(`${process.env.NEXT_PUBLIC_API_URL}/pipeline-ws/${session_id}`);
             websocketRef.current = websocket;

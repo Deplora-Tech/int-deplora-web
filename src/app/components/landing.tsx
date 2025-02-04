@@ -4,22 +4,34 @@ import { ArrowDown, ArrowRight, CircleStop } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
-import {useMessages } from "../hooks/messages";
+import { useMessages } from "../hooks/messages";
 import { LoraStatus, statusMessages } from "../constants/Enums";
 import { Avatar } from "./ui/avatar";
-import AnimatedStatus from "./animated-status";
+import { v4 } from "uuid";
 import { LampContainer } from "./ui/lamp";
 import { motion } from "framer-motion";
+import { useSession } from "../hooks/session";
 
 export function LandingChat() {
   const [input, setInput] = useState("");
   const { messages, addMessage, loraStatus } = useMessages();
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const { setSessionId, session_id } = useSession();
   const isLoraActive =
     loraStatus &&
     loraStatus !== LoraStatus.COMPLETED &&
     loraStatus !== LoraStatus.FAILED;
+  
+  useEffect(() => {
+    if (!session_id) {
+      const id = v4();
+      setSessionId(id);
+      console.log("Setting session id:", id);
+    }
+  }, []);
+  
+
   const handleScrollToBottom = () => {
     containerRef.current?.scrollTo({
       top: containerRef.current.scrollHeight,
@@ -86,11 +98,10 @@ export function LandingChat() {
                   </Avatar>
                 )}
                 <div
-                  className={`flex-1 rounded-lg px-4 py-3 ${
-                    message.sender === "Deplora"
+                  className={`flex-1 rounded-lg px-4 py-3 ${message.sender === "Deplora"
                       ? "bg-white/[0.02]"
                       : "bg-white/[0.05]"
-                  }`}
+                    }`}
                 >
                   <p className="text-sm text-neutral-200 leading-relaxed">
                     {message.content}

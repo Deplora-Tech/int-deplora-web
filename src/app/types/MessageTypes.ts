@@ -17,7 +17,6 @@ export interface MessageContextType {
   fileContent: Record<string, string>;
   setFileContent: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   loraStatus?: LoraStatus;
-  setMessageHistory: (session_id: string) => void;
-  session_id: string;
+  setMessageHistory: () => void;
   graph: GraphType | null;
 }
