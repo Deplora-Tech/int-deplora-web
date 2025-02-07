@@ -136,9 +136,10 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const setMessageHistory = () => {
     if (!session_id) {
-      console.error("Session ID not set.");
       return;
     };
+    console.log("Setting message history for session:", session_id);
+
     load_conv(session_id).then(({ chat_history, current_plan }) => {
 
       const formattedMessages: Message[] = chat_history.map((chat: { role: string; message: string }): Message => ({
