@@ -6,6 +6,7 @@ import { Button } from "./components/ui/button";
 import { MessageProvider } from "./hooks/messages";
 import { PipelineProvider } from "./hooks/pipeline"
 import {SessionProvider} from "./hooks/session"
+import Link from "next/link";
 
 export default function RootLayout({
   children,
@@ -37,7 +38,7 @@ export default function RootLayout({
                 <div className="flex items-center justify-between w-full px-4">
                   <div className="flex items-center gap-4">
                     <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">
-                      Deplora
+                      <Link href="/">Deplora</Link>
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
