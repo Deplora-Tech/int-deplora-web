@@ -5,7 +5,8 @@ import "./globals.css";
 import { Button } from "./components/ui/button";
 import { ChatHistorySidebar } from "./components/chat-history"; // Import the ChatHistorySidebar component
 import { MessageProvider } from "./hooks/messages";
-
+import { PipelineProvider } from "./hooks/pipeline";
+import { SessionProvider } from "./hooks/session";
 import { useState } from "react";
 
 const chatDetails = [
@@ -13,11 +14,6 @@ const chatDetails = [
   { id: 2, title: "Docker Deployment" },
   { id: 3, title: "AWS Lambda Setup" },
 ];
-
-import { PipelineProvider } from "./hooks/pipeline"
-import {SessionProvider} from "./hooks/session"
-import Link from "next/link";
-
 
 export default function RootLayout({
   children,
@@ -37,35 +33,27 @@ export default function RootLayout({
       <SessionProvider>
       <MessageProvider>
         <PipelineProvider>
-          <body className="min-h-screen flex flex-col bg-[#011521] text-white overflow-hidden">
-            {/* Gradient background */}
-            <div className="fixed inset-0">
-              {/* Base dark gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#000000] via-[#0a0a0a] to-[#010101]" />
+        <body className="min-h-screen flex flex-col bg-[#011521] text-white overflow-hidden">
+          {/* Gradient background */}
+          <div className="fixed inset-0">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#000000] via-[#0a0a0a] to-[#010101]" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,170,255,0.01),rgba(0,0,0,0))]" />
+            <div className="absolute inset-0 bg-noise opacity-5 mix-blend-overlay" />
+          </div>
 
-              {/* Light source effect at the top */}
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,170,255,0.01),rgba(0,0,0,0))]" />
+          <div className="relative flex flex-col flex-1">
+            <header className="relative flex h-14 items-center border-b border-white/[0.1] bg-gradient-to-r from-black/40 via-[#01010101] to-black backdrop-blur-md z-50">
+              {/* Header layout */}
+              <div className="flex items-center justify-between w-full px-4">
+                <div className="flex items-center gap-4">
+                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">
+                    Deplora
+                  </span>
 
-              {/* Slight texture overlay for depth */}
-              <div className="absolute inset-0 bg-noise opacity-5 mix-blend-overlay" />
-            </div>
-
-            <div className="relative flex flex-col flex-1">
-              <header className="relative flex h-14 items-center border-b border-white/[0.1] bg-gradient-to-r from-black/40 via-[#01010101] to-black backdrop-blur-md">
-                {/* Gradient positioned at the top-right border */}
-
-                <div className="flex items-center justify-between w-full px-4">
-                  <div className="flex items-center gap-4">
-                    <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">
-                      <Link href="/">Deplora</Link>
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {/* <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-neutral-400 hover:text-white"
-
+                  {/* Stylish Current Chat Button */}
+                  <div
+                    className="relative group"
+                    onClick={() => setIsChatHistoryOpen(!isChatHistoryOpen)}
                   >
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gradient-to-r from-blue-500/10 to-teal-400/10 border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer">
                       {isChatHistoryOpen ? (
@@ -81,7 +69,6 @@ export default function RootLayout({
                   </div>
                 </div>
 
-
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
@@ -89,12 +76,10 @@ export default function RootLayout({
                   >
                     <ArrowUpRight className="w-4 h-4 mr-2" />
                     Deploy
-
                   </Button>
-
                 </div>
-              </header>
-
+              </div>
+            </header>
 
             <main className="flex-1 flex min-h-0 overflow-hidden gap-6">
               {/* Chat History Component */}
@@ -113,7 +98,7 @@ export default function RootLayout({
               background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             }
           `}</style>
-          </body>
+        </body>
         </PipelineProvider>
       </MessageProvider>
       </SessionProvider>
