@@ -3,12 +3,13 @@
 import { useEffect, useState } from "react";
 
 import { Landing, LandingChat } from "./components/landing";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 
 import {  useMessages } from "./hooks/messages";
 import { useSession } from "./hooks/session";
 import { LoraStatus, statusMessages } from "./constants/Enums";
-import { redirect } from 'next/navigation'
+
+
 
 export default function Home() {
   const { loraStatus, fileContent } = useMessages();
@@ -16,7 +17,6 @@ export default function Home() {
   const [hasFiles, setHasFiles] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const router = useRouter();
-
 
   useEffect(() => {
     if (loraStatus === LoraStatus.STARTING) {
