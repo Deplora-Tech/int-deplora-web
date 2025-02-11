@@ -1,14 +1,14 @@
 import { TabsList, TabsTrigger } from "../ui/tabs";
 import { ArrowUpRight } from "lucide-react";
 import { Button } from "../../components/ui/button";
-import { useMessages } from "../../hooks/messages";
+import { useSession } from "../../hooks/session";
 
 interface TabsHeaderProps {
   setIsModalOpen: (isOpen: boolean) => void;
 }
 
 export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
-  const { session_id } = useMessages();
+  const { session_id } = useSession();
 
   const handleDeploy = () => {
     // Show the modal popup

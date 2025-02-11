@@ -16,6 +16,7 @@ const chatDetails = [
 
 import { PipelineProvider } from "./hooks/pipeline"
 import {SessionProvider} from "./hooks/session"
+import Link from "next/link";
 
 
 export default function RootLayout({
@@ -35,28 +36,36 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <SessionProvider>
       <MessageProvider>
-    <PipelineProvider>
-        <body className="min-h-screen flex flex-col bg-[#011521] text-white overflow-hidden">
-          {/* Gradient background */}
-          <div className="fixed inset-0">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#000000] via-[#0a0a0a] to-[#010101]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,170,255,0.01),rgba(0,0,0,0))]" />
-            <div className="absolute inset-0 bg-noise opacity-5 mix-blend-overlay" />
-          </div>
+        <PipelineProvider>
+          <body className="min-h-screen flex flex-col bg-[#011521] text-white overflow-hidden">
+            {/* Gradient background */}
+            <div className="fixed inset-0">
+              {/* Base dark gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-[#000000] via-[#0a0a0a] to-[#010101]" />
 
-          <div className="relative flex flex-col flex-1">
-            <header className="relative flex h-14 items-center border-b border-white/[0.1] bg-gradient-to-r from-black/40 via-[#01010101] to-black backdrop-blur-md z-50">
-              {/* Header layout */}
-              <div className="flex items-center justify-between w-full px-4">
-                <div className="flex items-center gap-4">
-                  <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">
-                    Deplora
-                  </span>
+              {/* Light source effect at the top */}
+              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(0,170,255,0.01),rgba(0,0,0,0))]" />
 
-                  {/* Stylish Current Chat Button */}
-                  <div
-                    className="relative group"
-                    onClick={() => setIsChatHistoryOpen(!isChatHistoryOpen)}
+              {/* Slight texture overlay for depth */}
+              <div className="absolute inset-0 bg-noise opacity-5 mix-blend-overlay" />
+            </div>
+
+            <div className="relative flex flex-col flex-1">
+              <header className="relative flex h-14 items-center border-b border-white/[0.1] bg-gradient-to-r from-black/40 via-[#01010101] to-black backdrop-blur-md">
+                {/* Gradient positioned at the top-right border */}
+
+                <div className="flex items-center justify-between w-full px-4">
+                  <div className="flex items-center gap-4">
+                    <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">
+                      <Link href="/">Deplora</Link>
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {/* <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-neutral-400 hover:text-white"
+
                   >
                     <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-gradient-to-r from-blue-500/10 to-teal-400/10 border border-white/10 hover:border-white/20 transition-all duration-300 cursor-pointer">
                       {isChatHistoryOpen ? (
