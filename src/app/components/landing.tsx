@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowRight, CircleStop } from "lucide-react";
+import { ArrowDown, ArrowRight, CircleStop, Link } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -10,6 +10,8 @@ import { Avatar } from "./ui/avatar";
 import { v4 } from "uuid";
 import { LampContainer } from "./ui/lamp";
 import { motion } from "framer-motion";
+
+import { Popup } from "./popup"; // Import the Popup component
 import { useSession } from "../hooks/session";
 
 export function LandingChat() {
@@ -17,11 +19,15 @@ export function LandingChat() {
   const { messages, addMessage, loraStatus } = useMessages();
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+
+  const [showPopup, setShowPopup] = useState(false); // Popup state
+  const [selectedRepo, setSelectedRepo] = useState(""); // Selected project/repo
   const { setSessionId, session_id } = useSession();
   const isLoraActive =
     loraStatus &&
     loraStatus !== LoraStatus.COMPLETED &&
     loraStatus !== LoraStatus.FAILED;
+
   
   useEffect(() => {
     if (!session_id) {
@@ -30,7 +36,7 @@ export function LandingChat() {
       console.log("Setting session id:", id);
     }
   }, []);
-  
+
 
   const handleScrollToBottom = () => {
     containerRef.current?.scrollTo({
@@ -57,6 +63,7 @@ export function LandingChat() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedRepo) return; // Ensure a project is selected
     if (input.trim()) {
       addMessage({
         content: input,
@@ -69,7 +76,7 @@ export function LandingChat() {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-4 space-y-8 min-w-48">
+    <div className="flex-1 flex flex-col items-center justify-center px-4  space-y-0 min-w-48">
       {messages.length === 0 && (
         <div className="space-y-4 text-center max-w-3xl mx-auto">
           <h1 className="text-4xl sm:text-6xl font-bold text-white">
@@ -78,6 +85,17 @@ export function LandingChat() {
           <p className="text-lg text-neutral-400">
             Prompt, run, edit, and deploy full-stack web apps.
           </p>
+          <Button
+            variant="outline"
+            className="group relative px-4 py-2 text-s bg-neutral-900/50 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-neutral-200 hover:text-white transition-all"
+            onClick={() => setShowPopup(true)}
+          >
+            <span className="flex items-center gap-2">
+              <Link className="w-4 h-4" />
+              Add Project
+            </span>
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-xl" />
+          </Button>
         </div>
       )}
       <div className="w-full max-w-4xl mx-auto">
@@ -142,9 +160,12 @@ export function LandingChat() {
             type="submit"
             size="icon"
             style={{
-              display: input.length > 0 || isLoraActive ? "flex" : "none",
+              display: input.length > 0 ? "flex" : "none",
             }}
-            className={`absolute right-2 top-2 h-10 w-10 bg-blue-500 hover:bg-blue-600 text-white`}
+            disabled={!selectedRepo} // Disable until a project is selected
+            className={`absolute right-2 top-2 h-10 w-10 bg-blue-500 hover:bg-blue-600 text-white ${
+              !selectedRepo ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
             {isLoraActive ? (
               <CircleStop className="h-5 w-5" />
@@ -153,6 +174,18 @@ export function LandingChat() {
             )}
           </Button>
         </form>
+
+        {showPopup && (
+          <Popup
+            onClose={() => setShowPopup(false)}
+            onRepoSelect={(repo) => {
+              setSelectedRepo(repo);
+              setShowPopup(false);
+            }}
+            selectedRepo={selectedRepo}
+          />
+        )}
+
         <div className="mt-2 flex items-center justify-center gap-1 text-xs text-neutral-500">
           <span>Use</span>
           <kbd className="px-1.5 py-0.5 text-[10px] bg-neutral-800 rounded border border-neutral-700">
@@ -226,7 +259,6 @@ export function LandingChat() {
 }
 
 export function Landing() {
-
   return (
     <LampContainer>
       <motion.h1
