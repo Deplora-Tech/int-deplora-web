@@ -21,8 +21,7 @@ export function LandingChat() {
   const [showScrollButton, setShowScrollButton] = useState(false);
 
   const [showPopup, setShowPopup] = useState(false); // Popup state
-  const [selectedRepo, setSelectedRepo] = useState(""); // Selected project/repo
-  const { setSessionId, session_id } = useSession();
+  const { setSessionId, session_id , project_id, setProjectId} = useSession();
   const isLoraActive =
     loraStatus &&
     loraStatus !== LoraStatus.COMPLETED &&
@@ -63,7 +62,7 @@ export function LandingChat() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedRepo) return; // Ensure a project is selected
+    if (!project_id) return; // Ensure a project is selected
     if (input.trim()) {
       addMessage({
         content: input,
@@ -162,9 +161,9 @@ export function LandingChat() {
             style={{
               display: input.length > 0 ? "flex" : "none",
             }}
-            disabled={!selectedRepo} // Disable until a project is selected
+            disabled={!project_id} // Disable until a project is selected
             className={`absolute right-2 top-2 h-10 w-10 bg-blue-500 hover:bg-blue-600 text-white ${
-              !selectedRepo ? "opacity-50 cursor-not-allowed" : ""
+              !project_id ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {isLoraActive ? (
@@ -179,10 +178,10 @@ export function LandingChat() {
           <Popup
             onClose={() => setShowPopup(false)}
             onRepoSelect={(repo) => {
-              setSelectedRepo(repo);
+              setProjectId(repo);
               setShowPopup(false);
             }}
-            selectedRepo={selectedRepo}
+            selectedRepo={project_id}
           />
         )}
 
