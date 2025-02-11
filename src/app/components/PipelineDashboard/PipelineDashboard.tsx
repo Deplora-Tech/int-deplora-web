@@ -6,53 +6,53 @@ import { StageIcon } from "../stage-icon";
 import { StageConnector } from "../stage-connector";
 import { LogViewer } from "../log-viewer";
 import { PipelineState, Stage } from "../../types/pipeline";
+import {usePipeline} from "../../hooks/pipeline";
 
 export const metadata = {
   title: "CI Pipeline Dashboard",
   description: "Monitor your CI/CD pipeline progress",
 };
 
-const INITIAL_PIPELINE_STATE: PipelineState = {
-  stages: [
-    {
-      id: "build",
-      name: "Build",
-      status: "completed",
-      logs: [
-        "Installing dependencies...",
-        "Building project...",
-        "Build successful!",
-      ],
-    },
-    {
-      id: "test",
-      name: "Test",
-      status: "completed",
-      logs: ["Running unit tests...", "Testing API endpoints..."],
-    },
-    { id: "deploy", name: "Deploy", status: "in-progress", logs: [] },
-    { id: "verify", name: "Verify", status: "pending", logs: [] },
-  ],
-  currentStage: 1,
-  startTime: Date.now(),
-  estimatedDuration: 90 * 60 * 1000, // 90 minutes in milliseconds
-};
+// const INITIAL_PIPELINE_STATE: PipelineState = {
+//   stages: [
+//     {
+//       id: "build",
+//       name: "Build",
+//       status: "completed",
+//       logs: [
+//         "Installing dependencies...",
+//         "Building project...",
+//         "Build successful!",
+//       ],
+//     },
+//     {
+//       id: "test",
+//       name: "Test",
+//       status: "completed",
+//       logs: ["Running unit tests...", "Testing API endpoints..."],
+//     },
+//     { id: "deploy", name: "Deploy", status: "in-progress", logs: [] },
+//     { id: "verify", name: "Verify", status: "pending", logs: [] },
+//   ],
+//   currentStage: 1,
+//   startTime: Date.now(),
+//   estimatedDuration: 90 * 60 * 1000, // 90 minutes in milliseconds
+// };
 
 export default function PipelineDashboard() {
-  const [pipeline, setPipeline] = useState<PipelineState>(
-    INITIAL_PIPELINE_STATE
-  );
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
+  const {pipelineData} = usePipeline();
 
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
-      setElapsedTime(now - pipeline.startTime);
+      // setElapsedTime(now - pipeline.startTime);
+      setElapsedTime(100)
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [pipeline.startTime]);
+  }, [pipelineData.timestamp]);
 
   const formatTime = (ms: number): string => {
     const minutes = Math.floor(ms / 60000);
@@ -66,10 +66,10 @@ export default function PipelineDashboard() {
     }
   };
 
-  const estimatedTimeRemaining = pipeline.estimatedDuration - elapsedTime;
+  const estimatedTimeRemaining = pipelineData.estimatedDuration - elapsedTime;
 
   return (
-    <Card className="w-full max-w-4xl mx-auto bg-gray-950 text-white border-gray-800">
+    <Card className="w-full max-w-4xl mx-auto bg-gray-950 text-white border-gray-800 max-h-full">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">
           CI Pipeline Dashboard
@@ -79,15 +79,15 @@ export default function PipelineDashboard() {
         <div>
           <h2 className="text-xl mb-6">Pipeline Overview</h2>
           <div className="flex items-center justify-center">
-            {pipeline.stages.map((stage, index) => (
+            {pipelineData.stages?.map((stage, index) => (
               <div key={stage.id} className="flex items-center">
                 <StageIcon
                   status={stage.status}
-                  isActive={pipeline.currentStage === index}
+                  isActive={pipelineData.currentStage === index}
                   onClick={() => handleStageClick(stage)}
                 />
-                {index < pipeline.stages.length - 1 && (
-                  <StageConnector isActive={index < pipeline.currentStage} />
+                {index < pipelineData.stages.length - 1 && (
+                  <StageConnector isActive={index < pipelineData.currentStage} />
                 )}
               </div>
             ))}

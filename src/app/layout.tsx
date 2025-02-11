@@ -5,6 +5,7 @@ import "./globals.css";
 import { Button } from "./components/ui/button";
 import { ChatHistorySidebar } from "./components/chat-history"; // Import the ChatHistorySidebar component
 import { MessageProvider } from "./hooks/messages";
+
 import { useState } from "react";
 
 const chatDetails = [
@@ -12,6 +13,10 @@ const chatDetails = [
   { id: 2, title: "Docker Deployment" },
   { id: 3, title: "AWS Lambda Setup" },
 ];
+
+import { PipelineProvider } from "./hooks/pipeline"
+import {SessionProvider} from "./hooks/session"
+
 
 export default function RootLayout({
   children,
@@ -28,7 +33,9 @@ export default function RootLayout({
 
   return (
     <html lang="en" className="dark">
+      <SessionProvider>
       <MessageProvider>
+    <PipelineProvider>
         <body className="min-h-screen flex flex-col bg-[#011521] text-white overflow-hidden">
           {/* Gradient background */}
           <div className="fixed inset-0">
@@ -65,6 +72,7 @@ export default function RootLayout({
                   </div>
                 </div>
 
+
                 <div className="flex items-center gap-2">
                   <Button
                     size="sm"
@@ -72,10 +80,12 @@ export default function RootLayout({
                   >
                     <ArrowUpRight className="w-4 h-4 mr-2" />
                     Deploy
+
                   </Button>
+
                 </div>
-              </div>
-            </header>
+              </header>
+
 
             <main className="flex-1 flex min-h-0 overflow-hidden gap-6">
               {/* Chat History Component */}
@@ -94,8 +104,10 @@ export default function RootLayout({
               background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
             }
           `}</style>
-        </body>
+          </body>
+        </PipelineProvider>
       </MessageProvider>
+      </SessionProvider>
     </html>
   );
 }

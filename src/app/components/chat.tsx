@@ -1,8 +1,8 @@
 "use client";
 
-import { Avatar } from "@/app/components/ui/avatar";
-import { Button } from "@/app/components/ui/button";
-import { Input } from "@/app/components/ui/input";
+import { Avatar } from "./ui/avatar";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import {
   ArrowDown,
   ArrowRight,
@@ -11,7 +11,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { LoraStatus, useMessages } from "../hooks/messages";
+import { useMessages } from "../hooks/messages";
+import { LoraStatus } from "../constants/Enums";
 import AnimatedStatus from "./animated-status";
 
 export function Chat() {
