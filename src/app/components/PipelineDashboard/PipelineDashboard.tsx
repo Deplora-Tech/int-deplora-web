@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { StageIcon } from "../stage-icon";
 import { StageConnector } from "../stage-connector";
 import { LogViewer } from "../log-viewer";
-import { PipelineState, Stage } from "../../types/pipeline";
+import { PipelineState,  PipelineStage} from "../../types/PipelineTypes";
+import { PipelineStageStatus } from "@/app/constants/Enums";
 import {usePipeline} from "../../hooks/pipeline";
 
 export const metadata = {
@@ -13,36 +14,41 @@ export const metadata = {
   description: "Monitor your CI/CD pipeline progress",
 };
 
+
+
 // const INITIAL_PIPELINE_STATE: PipelineState = {
 //   stages: [
 //     {
 //       id: "build",
 //       name: "Build",
-//       status: "completed",
+//       status: PipelineStageStatus.PENDING,
 //       logs: [
 //         "Installing dependencies...",
 //         "Building project...",
 //         "Build successful!",
 //       ],
+//       duration: 120000,
 //     },
 //     {
 //       id: "test",
 //       name: "Test",
-//       status: "completed",
+//       status: PipelineStageStatus.SUCCESS,
 //       logs: ["Running unit tests...", "Testing API endpoints..."],
+//       duration: 180000,
 //     },
-//     { id: "deploy", name: "Deploy", status: "in-progress", logs: [] },
-//     { id: "verify", name: "Verify", status: "pending", logs: [] },
+//     { id: "deploy", name: "Deploy", status: PipelineStageStatus.IN_PROGRESS, logs: [], duration: 0 },
+//     { id: "verify", name: "Verify", status: PipelineStageStatus.FAILED, logs: [], duration: 0 },
 //   ],
-//   currentStage: 1,
-//   startTime: Date.now(),
+//   currentStage: 0,
+//   // startTime: Date.now(),
 //   estimatedDuration: 90 * 60 * 1000, // 90 minutes in milliseconds
 // };
 
 export default function PipelineDashboard() {
-  const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
+  const [selectedStage, setSelectedStage] = useState<PipelineStage | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const {pipelineData} = usePipeline();
+  // const pipelineData = INITIAL_PIPELINE_STATE;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -60,16 +66,15 @@ export default function PipelineDashboard() {
     return `${minutes}m ${seconds}s`;
   };
 
-  const handleStageClick = (stage: Stage) => {
-    if (stage.status === "completed" || stage.status === "in-progress") {
-      setSelectedStage(stage);
-    }
+  const handleStageClick = (stage: PipelineStage) => {
+    setSelectedStage(stage);
   };
 
   const estimatedTimeRemaining = pipelineData.estimatedDuration - elapsedTime;
 
   return (
     <Card className="w-full max-w-4xl mx-auto bg-gray-950 text-white border-gray-800 max-h-full">
+      {JSON.stringify(pipelineData?.stages?.map(x => x.status))}
       <CardHeader>
         <CardTitle className="text-2xl font-bold">
           CI Pipeline Dashboard

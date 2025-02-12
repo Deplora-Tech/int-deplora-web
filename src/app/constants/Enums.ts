@@ -48,3 +48,10 @@ export enum DeploymentOptions {
     [LoraStatus.COMPLETED]: "Process completed successfully!",
     [LoraStatus.FAILED]: "Something went wrong. Please try again.",
   };
+
+  export enum PipelineStageStatus {
+    IN_PROGRESS = "IN_PROGRESS",
+    PENDING = "PENDING",
+    SUCCESS = "success",
+    FAILED = "FAILED",
+  }

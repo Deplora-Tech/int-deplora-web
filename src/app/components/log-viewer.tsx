@@ -1,14 +1,18 @@
 import { X } from "lucide-react";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
-import { Stage } from "../types/pipeline";
+import { PipelineStage } from "../types/PipelineTypes";
+import { usePipeline } from "../hooks/pipeline";
 
 interface LogViewerProps {
-  stage: Stage;
+  stage: PipelineStage;
   onClose: () => void;
 }
 
 export function LogViewer({ stage, onClose }: LogViewerProps) {
+  const { pipelineData } = usePipeline();
+  const stageLogs = pipelineData.stages.find(s => s.name === stage.name)?.logs || [];
+
   return (
     <div className="mt-6 bg-gray-900 rounded-lg border border-gray-800">
       <div className="flex items-center justify-between p-4 border-b border-gray-800">
@@ -18,7 +22,7 @@ export function LogViewer({ stage, onClose }: LogViewerProps) {
         </Button>
       </div>
       <ScrollArea className="h-[300px] p-4">
-        {stage.logs?.map((log, index) => (
+        {stageLogs.map((log, index) => (
           <div key={index} className="font-mono text-sm text-gray-400">
             {log}
           </div>
