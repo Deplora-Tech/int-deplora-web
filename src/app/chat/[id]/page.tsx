@@ -12,7 +12,7 @@ const Page = () => {
     const { fileContent, setMessageHistory } = useMessages();
     const [hasFiles, setHasFiles] = useState(false);
     const params = useParams();
-    const [isModalOpen, setIsModalOpen] = useState(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const { setSessionId, session_id } = useSession();
 
     useEffect(() => {

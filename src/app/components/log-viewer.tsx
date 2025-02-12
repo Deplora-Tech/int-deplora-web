@@ -3,6 +3,15 @@ import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { PipelineStage } from "../types/PipelineTypes";
 import { usePipeline } from "../hooks/pipeline";
+import AnsiToHtml from "ansi-to-html";
+
+// Create a converter instance with optional configuration.
+const converter = new AnsiToHtml({
+  // Example options (optional):
+  // fg: '#FFF',
+  // bg: '#000',
+  // newline: true,
+});
 
 interface LogViewerProps {
   stage: PipelineStage;
@@ -11,7 +20,8 @@ interface LogViewerProps {
 
 export function LogViewer({ stage, onClose }: LogViewerProps) {
   const { pipelineData } = usePipeline();
-  const stageLogs = pipelineData.stages.find(s => s.name === stage.name)?.logs || [];
+  const stageLogs =
+    pipelineData.stages.find((s) => s.name === stage.name)?.logs || [];
 
   return (
     <div className="mt-6 bg-gray-900 rounded-lg border border-gray-800">
@@ -22,11 +32,19 @@ export function LogViewer({ stage, onClose }: LogViewerProps) {
         </Button>
       </div>
       <ScrollArea className="h-[300px] p-4">
-        {stageLogs.map((log, index) => (
-          <div key={index} className="font-mono text-sm text-gray-400">
-            {log}
-          </div>
-        ))}
+        {stageLogs.map((log, index) => {
+          // Convert the ANSI log string to HTML
+          const html = converter.toHtml(log);
+
+          return (
+            <div
+              key={index}
+              className="font-mono text-sm text-gray-400 whitespace-pre-wrap"
+              // Render the formatted HTML. Ensure you trust the log content!
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
+          );
+        })}
       </ScrollArea>
     </div>
   );

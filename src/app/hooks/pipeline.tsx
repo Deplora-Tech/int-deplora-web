@@ -55,14 +55,10 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
                         data["stages"] = stages;
                         data["currentStage"] = 0;
                         setPipelineData(data);
-                        console.log("Pipeline data:", data);
                     }
                     else if (res.status === ExcecutionStatus.PROCESSING) {
-                        console.log("Pipeline processing data");
                         let data = JSON.parse(res.data);
                         let stages = currentData?.stages ?? [];
-                        console.log("Current data:", currentData);
-
                         for (let updatedStage of data.stages) {
                             let stageIndex = stages.findIndex((stage) => stage.name === updatedStage.name);
                             if (stageIndex !== -1) {
@@ -70,7 +66,6 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
                             }
                         }
 
-                        console.log("Updated stages:", stages);
 
                         setPipelineData({
                             ...pipelineData,

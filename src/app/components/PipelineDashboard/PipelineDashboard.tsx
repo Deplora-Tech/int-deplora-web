@@ -48,15 +48,25 @@ export default function PipelineDashboard() {
   const [selectedStage, setSelectedStage] = useState<PipelineStage | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const {pipelineData} = usePipeline();
-  // const pipelineData = INITIAL_PIPELINE_STATE;
+
+
   useEffect(() => {
+    let in_progress = pipelineData?.stages?.find((stage) => stage.status === PipelineStageStatus.IN_PROGRESS);
+
+    if (in_progress && !selectedStage){
+      setSelectedStage(in_progress);
+    }
+
+    if (!in_progress || !pipelineData?.timestamp) return; // Exit if timestamp is not available
+
     const interval = setInterval(() => {
       const now = Date.now();
-      setElapsedTime(now - pipelineData.timestamp);
+      setElapsedTime(now - Number(pipelineData.timestamp));
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [pipelineData.timestamp]);
+  
+  }, [pipelineData]);
 
   const formatTime = (ms: number): string => {
     const minutes = Math.floor(ms / 60000);
