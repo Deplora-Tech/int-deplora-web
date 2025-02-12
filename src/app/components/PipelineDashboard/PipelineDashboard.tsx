@@ -49,12 +49,10 @@ export default function PipelineDashboard() {
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const {pipelineData} = usePipeline();
   // const pipelineData = INITIAL_PIPELINE_STATE;
-
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
-      // setElapsedTime(now - pipeline.startTime);
-      setElapsedTime(100)
+      setElapsedTime(now - pipelineData.timestamp);
     }, 1000);
 
     return () => clearInterval(interval);
