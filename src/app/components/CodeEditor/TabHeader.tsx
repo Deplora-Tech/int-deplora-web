@@ -13,7 +13,9 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
   const handleDeploy = () => {
     // Show the modal popup
     setIsModalOpen(true);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/excecute/${session_id}`, {});
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/execute/${session_id}`, {
+      method: 'POST',
+    });
   };
 
 

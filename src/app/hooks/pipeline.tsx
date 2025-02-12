@@ -43,6 +43,7 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
 
                     if (res.status === ExcecutionStatus.INITIALIZE) {
                         let data = JSON.parse(res.data);
+                        
                         let stages = data["stages"].map((stage: any) => {
                             return {
                                 'id': stage,
@@ -54,6 +55,7 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
                         });
                         data["stages"] = stages;
                         data["currentStage"] = 0;
+                        console.log("Pipeline data:", data);
                         setPipelineData(data);
                     }
                     else if (res.status === ExcecutionStatus.PROCESSING) {
@@ -68,10 +70,10 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
 
 
                         setPipelineData({
-                            ...pipelineData,
+                            ...currentData,
                             stages: stages,
                             currentStage: data.currentStage,
-                            id: pipelineData?.id ?? "",
+                            id: currentData?.id ?? "",
                             estimatedDuration: data?.estimatedDuration,
                             duration: data?.duration,
                             timestamp: data?.timestamp,

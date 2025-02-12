@@ -8,6 +8,7 @@ import { LogViewer } from "../log-viewer";
 import { PipelineState,  PipelineStage} from "../../types/PipelineTypes";
 import { PipelineStageStatus } from "@/app/constants/Enums";
 import {usePipeline} from "../../hooks/pipeline";
+import { useSession } from "@/app/hooks/session";
 
 export const metadata = {
   title: "CI Pipeline Dashboard",
@@ -48,6 +49,7 @@ export default function PipelineDashboard() {
   const [selectedStage, setSelectedStage] = useState<PipelineStage | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const {pipelineData} = usePipeline();
+  const {session_id} = useSession();
 
 
   useEffect(() => {
@@ -80,9 +82,15 @@ export default function PipelineDashboard() {
 
   const estimatedTimeRemaining = pipelineData.estimatedDuration - elapsedTime;
 
+  const abortPipeline = () => {
+    if (!session_id || !pipelineData?.id) return;
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/abort/${session_id}/${pipelineData.id}`, {
+      method: 'POST',
+    });
+  };
+
   return (
-    <Card className="w-full max-w-4xl mx-auto bg-gray-950 text-white border-gray-800 max-h-full">
-      {JSON.stringify(pipelineData?.stages?.map(x => x.status))}
+    <Card className="w-full max-w-4xl mx-auto bg-gray-950 text-white border-gray-800">
       <CardHeader>
         <CardTitle className="text-2xl font-bold">
           CI Pipeline Dashboard

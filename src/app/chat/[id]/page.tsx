@@ -33,61 +33,24 @@ const Page = () => {
     }, [fileContent]);
 
     return (
-        <div className="flex-1 flex min-h-0 p-4">
+        <div className="flex-1 flex min-h-0 p-4 bg-transparent"> 
             <ResizablePanel>
                 <Chat />
             </ResizablePanel>
             {hasFiles ? <CodeEditor setIsModalOpen={setIsModalOpen} /> : null}
             {isModalOpen ? (
-                <div className="modal">
-                    <div className="modal-content">
-                        <span className="close" onClick={() => setIsModalOpen(false)}>&times;</span>
+                <div className="fixed inset-0 flex place-self-center bg-black bg-opacity-50 max-h-80 overflow-y-scroll p-0">
+                    <div className="bg-black rounded-lg shadow-xl min-w-max">
+                        <span 
+                            className="absolute top-4 right-4 text-white text-2xl cursor-pointer hover:text-red-500"
+                            onClick={() => setIsModalOpen(false)}
+                        >
+                            &times;
+                        </span>
                         <PipelineDashboard />
                     </div>
                 </div>
             ) : null}
-            <style jsx>{`
-                .modal {
-                    position: fixed;
-                    z-index: 1;
-                    left: 0;
-                    top: 0;
-                    width: 100%;
-                    height: 100%;
-                    overflow: auto;
-                    background-color: rgb(0,0,0);
-                    background-color: rgba(0,0,0,0.4);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                }
-                .modal-content {
-                    background-color: #fefefe;
-                    margin: auto;
-                    padding: 20px;
-                    border: 1px solid #888;
-                    width: 80%;
-                    max-width: 600px;
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-                    animation: animatetop 0.4s;
-                }
-                .close {
-                    color: #aaa;
-                    float: right;
-                    font-size: 28px;
-                    font-weight: bold;
-                }
-                .close:hover,
-                .close:focus {
-                    color: black;
-                    text-decoration: none;
-                    cursor: pointer;
-                }
-                @keyframes animatetop {
-                    from {top: -300px; opacity: 0}
-                    to {top: 0; opacity: 1}
-                }
-            `}</style>
         </div>
     );
 }
