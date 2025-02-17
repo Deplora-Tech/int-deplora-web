@@ -90,8 +90,8 @@ export default function PipelineDashboard() {
   };
 
   return (
-    <Card className="w-full max-w-4xl mx-auto bg-gray-950 text-white border-gray-800">
-      <CardHeader>
+  <Card className="w-full bg-gray-950 text-white border-gray-800">
+    <CardHeader>
         <CardTitle className="text-2xl font-bold">
           CI Pipeline Dashboard
         </CardTitle>

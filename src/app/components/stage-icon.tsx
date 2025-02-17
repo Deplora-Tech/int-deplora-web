@@ -20,7 +20,7 @@ export function StageIcon({
       onClick={onClick}
       className={cn(
         "relative w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-colors",
-        status === PipelineStageStatus.SUCCESS && "bg-blue-500 text-white",
+        status === PipelineStageStatus.SUCCESS && "bg-green-500 text-white",
         status === PipelineStageStatus.IN_PROGRESS && "bg-blue-600 text-white animate-pulse",
         status === PipelineStageStatus.PENDING && "bg-gray-800 text-gray-400",
         status === PipelineStageStatus.FAILED && "bg-red-500 text-white",

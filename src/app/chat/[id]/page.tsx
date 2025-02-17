@@ -39,8 +39,8 @@ const Page = () => {
             </ResizablePanel>
             {hasFiles ? <CodeEditor setIsModalOpen={setIsModalOpen} /> : null}
             {isModalOpen ? (
-                <div className="fixed inset-0 flex place-self-center bg-black bg-opacity-50 max-h-80 overflow-y-scroll p-0">
-                    <div className="bg-black rounded-lg shadow-xl min-w-max">
+                <div className="fixed w-2/3 inset-0 flex place-self-center  bg-opacity-50 p-0">
+                    <div className="rounded-lg shadow-xl min-w-max w-full place-self-center">
                         <span 
                             className="absolute top-4 right-4 text-white text-2xl cursor-pointer hover:text-red-500"
                             onClick={() => setIsModalOpen(false)}

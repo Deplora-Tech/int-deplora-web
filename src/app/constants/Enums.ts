@@ -52,6 +52,6 @@ export enum DeploymentOptions {
   export enum PipelineStageStatus {
     IN_PROGRESS = "IN_PROGRESS",
     PENDING = "PENDING",
-    SUCCESS = "success",
+    SUCCESS = "SUCCESS",
     FAILED = "FAILED",
   }

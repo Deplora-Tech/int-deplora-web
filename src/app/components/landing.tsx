@@ -181,7 +181,7 @@ export function LandingChat() {
               setProjectId(repo);
               setShowPopup(false);
             }}
-            selectedRepo={project_id}
+            selectedRepo={project_id!}
           />
         )}
 
