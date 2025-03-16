@@ -111,6 +111,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
           content: messageContent,
           timestamp: new Date(),
           userId: 1,
+          status: [],
         },
       ]);
 
@@ -120,9 +121,11 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       updateMessageStatus(LoraStatus.COMPLETED);
+      setLoraStatus(undefined);
     } catch (error) {
       console.error("Error sending message:", error);
       updateMessageStatus(LoraStatus.FAILED);
+      setLoraStatus(undefined);
     }
   };
 
@@ -158,6 +161,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
           sender: chat.role === "You" ? "Deplora" : "User",
           timestamp: new Date(),
           userId: 1,
+          status: [],
         })
       );
 

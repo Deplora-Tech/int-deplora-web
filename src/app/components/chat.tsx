@@ -62,6 +62,7 @@ export function Chat() {
           sender: "User",
           timestamp: new Date(),
           userId: 1,
+          status: [],
         });
       }, 1000);
       setInput("");
@@ -104,6 +105,15 @@ export function Chat() {
               {index === messages.length - 1 && loraStatus && (
                 <div className="mt-2">
                   <AnimatedStatus />
+                </div>
+              )}
+              {message.sender === "Deplora" && (
+                <div className="mt-2">
+                  <AnimatedStatus statusList={ [
+                    LoraStatus.GATHERING_DATA, 
+                    LoraStatus.STARTING, 
+                    LoraStatus.COMPLETED
+                  ]} />
                 </div>
               )}
             </div>

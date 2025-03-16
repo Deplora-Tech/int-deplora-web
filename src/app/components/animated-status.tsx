@@ -6,8 +6,18 @@ import { LoraStatus, statusMessages } from "../constants/Enums";
 import { useMessages } from "../hooks/messages";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 
-const AnimatedStatus: React.FC = () => {
-  const { statuses } = useMessages();
+interface AnimatedStatusProps {
+  statusList?: LoraStatus[];
+}
+
+const AnimatedStatus: React.FC<AnimatedStatusProps> = ({ statusList }) => {
+  let statuses: LoraStatus[] = [];
+  if (statusList) {
+    statuses = statusList;
+  } else {
+    statuses = useMessages().statuses;
+  }
+  console.log("Statuses:", statuses);
 
   if (!statuses || statuses.length === 0) {
     return null;

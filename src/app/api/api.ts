@@ -37,6 +37,7 @@ export const sendMessage = async (
   const response = await api.post("/send-message", {
     ...requestBody,
   });
+
   return response.data;
 };
 
