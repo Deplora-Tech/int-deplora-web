@@ -50,6 +50,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       if (Object.values(LoraStatus).includes(res.status)) {
         setLoraStatus(res.status);
         console.log("Lora status:", res.status);
+        updateMessageStatus(res.status);
       }
 
       if (Object.values(GraphStatus).includes(res.status)) {
@@ -79,12 +80,13 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       setLoraStatus(LoraStatus.FAILED);
       return;
     }
-    
+
     setLoraStatus(LoraStatus.STARTING);
     const id = crypto.randomUUID();
     setMessages((prev) => [...prev, { ...message, id }]);
     setStatusMap((prev) => ({ ...prev, [id]: [LoraStatus.STARTING] }));
     setCurrentMessageId(id);
+    console.log("Current message ID Set to:", id);
 
     try {
       const reply = await sendMessage({
@@ -121,6 +123,8 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const updateMessageStatus = (status: LoraStatus) => {
     if (!currentMessageId) return;
+    console.log("Updating message status:", status);
+    console.log("Current message ID:", currentMessageId);
     setStatusMap((prev) => {
       const currentStatuses = prev[currentMessageId] || [];
       return {
@@ -128,8 +132,9 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         [currentMessageId]: [...currentStatuses, status],
       };
     });
-
+    console.log("Status map updated:", status);
     if (status === LoraStatus.COMPLETED || status === LoraStatus.FAILED) {
+      console.log("Clearing current message ID.");
       setCurrentMessageId(null);
     }
   };
