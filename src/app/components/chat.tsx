@@ -16,8 +16,7 @@ import { LoraStatus } from "../constants/Enums";
 import AnimatedStatus from "./animated-status";
 
 export function Chat() {
-  const { messages, addMessage, loraStatus, statusMap, currentMessageId } =
-    useMessages();
+  const { messages, addMessage, loraStatus } = useMessages();
   const [input, setInput] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
@@ -47,6 +46,12 @@ export function Chat() {
       return () => container.removeEventListener("scroll", handleScroll);
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (messages.length > 0 || loraStatus !== undefined) {
+      handleScrollToBottom();
+    }
+  }, [messages.length, loraStatus]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,7 +90,7 @@ export function Chat() {
                 <div
                   className={`rounded-lg px-4 py-3 ${
                     message.sender === "Deplora"
-                      ? "bg-white/[0.02]"
+                      ? "bg-white/[0.02] border border-white/[0.03]"
                       : "bg-white/[0.05]"
                   }`}
                 >
@@ -95,8 +100,10 @@ export function Chat() {
                 </div>
               </div>
             </div>
-            {statusMap[message.id] && (
-              <AnimatedStatus statuses={statusMap[message.id]} />
+            {index === messages.length - 1 && loraStatus && (
+              <div className="mt-2">
+                <AnimatedStatus />
+              </div>
             )}
           </div>
         ))}
