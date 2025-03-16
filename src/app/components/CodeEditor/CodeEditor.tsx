@@ -194,9 +194,12 @@ function EditorContent({
 
 export function CodeEditor({ setIsModalOpen }: { setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
   const { fileContent, setFileContent } = useMessages();
-  const [selectedFile, setSelectedFile] = useState(
-    Object.keys(fileContent)[0] as keyof typeof fileContent
+  const [selectedFile, setSelectedFile] = useState<string>(
+    fileContent && typeof fileContent === "object" && Object.keys(fileContent).length > 0 
+      ? (Object.keys(fileContent)[0] as keyof typeof fileContent) 
+      : ""
   );
+  
   
 
   return (

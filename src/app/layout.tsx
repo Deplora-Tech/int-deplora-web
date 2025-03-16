@@ -69,15 +69,7 @@ export default function RootLayout({
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="sm"
-                    className="bg-gradient-to-r from-blue-500 to-teal-400 hover:bg-blue-600 text-white"
-                  >
-                    <ArrowUpRight className="w-4 h-4 mr-2" />
-                    Deploy
-                  </Button>
-                </div>
+                
               </div>
             </header>
 

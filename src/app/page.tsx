@@ -40,5 +40,5 @@ export default function Home() {
 
   // navigate to /chat/session_id
 
-  redirect(`chat/${session_id}`);
+  router.push(`chat/${session_id}`);
 }
