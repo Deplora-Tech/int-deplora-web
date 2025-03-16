@@ -18,13 +18,13 @@ const AnimatedStatus: React.FC = () => {
   const isFailed = currentStatus === LoraStatus.FAILED;
   const isFinished = isComplete || isFailed;
 
-  // Solid colors for better visibility
+  // Solid colors for icons and fallbacks
   const successColor = "#2DD4BF";
   const inProgressColor = "#3B82F6";
   const failedColor = "#f43f5e";
-  const pastColor = "#94a3b8"; // Lighter gray for better visibility
+  const pastColor = "#94a3b8";
 
-  // Gradient backgrounds for items (not text)
+  // Gradient backgrounds for items
   const successGradient =
     "linear-gradient(to right, rgba(59, 130, 246, 0.9), rgba(6, 182, 212, 0.15))";
   const inProgressGradient =
@@ -34,12 +34,18 @@ const AnimatedStatus: React.FC = () => {
   const pastGradient =
     "linear-gradient(to right, rgba(148, 163, 184, 0.1), rgba(148, 163, 184, 0.05))";
 
+  // Text gradients
+  const successTextGradient = "linear-gradient(to right, #3B82F6, #06b6d4)";
+  const inProgressTextGradient = "linear-gradient(to right, #3B82F6, #6366f1)";
+  const failedTextGradient = "linear-gradient(to right, #f43f5e, #e11d48)";
+  const pastTextGradient = "linear-gradient(to right, #94a3b8, #64748b)";
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
-      className="w-full rounded-lg p-5 shadow-lg border border-gray-800 bg-gray-900/20"
+      className="w-full rounded-lg p-3 shadow-lg  bg-gray-900/20"
     >
       {/* Status items */}
       <div className="space-y-1">
@@ -47,21 +53,25 @@ const AnimatedStatus: React.FC = () => {
           const isCurrentStatus = index === statuses.length - 1;
           const isPastStatus = index < statuses.length - 1;
 
-          // Determine gradient and text color
-          let itemGradient, textColor;
+          // Determine gradients for item background and text
+          let itemGradient, textGradient, iconColor;
 
           if (isPastStatus) {
             itemGradient = pastGradient;
-            textColor = pastColor;
+            textGradient = pastTextGradient;
+            iconColor = pastColor;
           } else if (status === LoraStatus.COMPLETED) {
             itemGradient = successGradient;
-            textColor = successColor;
+            textGradient = successTextGradient;
+            iconColor = successColor;
           } else if (status === LoraStatus.FAILED) {
             itemGradient = failedGradient;
-            textColor = failedColor;
+            textGradient = failedTextGradient;
+            iconColor = failedColor;
           } else {
             itemGradient = inProgressGradient;
-            textColor = inProgressColor;
+            textGradient = inProgressTextGradient;
+            iconColor = inProgressColor;
           }
 
           return (
@@ -70,17 +80,18 @@ const AnimatedStatus: React.FC = () => {
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: index * 0.15 }}
-              className={`flex items-center justify-between p-2 rounded-md`}
+              className="flex items-center justify-between p-2 rounded-md"
               style={{
-                background: isCurrentStatus
+                backgroundImage: isCurrentStatus ? "none" : itemGradient,
+                backgroundColor: isCurrentStatus
                   ? "rgba(0, 0, 0, 0.2)"
-                  : itemGradient,
+                  : "transparent",
                 borderWidth: isCurrentStatus ? "1px" : "0px",
                 borderColor: "rgba(31, 41, 55, 0.5)",
                 borderStyle: "solid",
               }}
             >
-              {/* Status text */}
+              {/* Status text with gradient */}
               <div className="flex-1 flex items-center">
                 <motion.span
                   initial={{ scale: 0.9 }}
@@ -92,8 +103,15 @@ const AnimatedStatus: React.FC = () => {
                     repeat: isCurrentStatus && !isFinished ? Infinity : 0,
                     repeatType: "reverse",
                   }}
-                  style={{ color: textColor }}
-                  className="text-sm"
+                  className="text-sm font-medium"
+                  style={{
+                    backgroundImage: textGradient,
+                    backgroundSize: "100%",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                    color: "transparent", // Modern browsers fallback
+                  }}
                 >
                   {statusMessages[status]}
                 </motion.span>
@@ -109,7 +127,7 @@ const AnimatedStatus: React.FC = () => {
                   >
                     <CheckCircle
                       className="w-5 h-5"
-                      style={{ color: successColor }}
+                      style={{ color: iconColor }}
                     />
                   </motion.div>
                 ) : status === LoraStatus.FAILED ? (
@@ -118,7 +136,7 @@ const AnimatedStatus: React.FC = () => {
                     animate={{ rotate: [0, 5, -5, 0], scale: 1 }}
                     transition={{ duration: 0.5 }}
                   >
-                    <XCircle className="w-5 h-5" style={{ color: textColor }} />
+                    <XCircle className="w-5 h-5" style={{ color: iconColor }} />
                   </motion.div>
                 ) : status === LoraStatus.COMPLETED ? (
                   <motion.div
@@ -128,7 +146,7 @@ const AnimatedStatus: React.FC = () => {
                   >
                     <CheckCircle
                       className="w-5 h-5"
-                      style={{ color: successColor }}
+                      style={{ color: iconColor }}
                     />
                   </motion.div>
                 ) : (
@@ -140,10 +158,7 @@ const AnimatedStatus: React.FC = () => {
                       ease: "linear",
                     }}
                   >
-                    <Loader2
-                      className="w-5 h-5"
-                      style={{ color: successColor }}
-                    />
+                    <Loader2 className="w-5 h-5" style={{ color: iconColor }} />
                   </motion.div>
                 )}
               </div>

@@ -76,35 +76,37 @@ export function Chat() {
       >
         {messages.map((message, index) => (
           <div className="flex-col gap-1" key={index}>
-            <div key={index} className="flex gap-3 group pb-3">
-              {message.sender === "User" && (
-                <Avatar className="w-8 h-8 rounded-full overflow-hidden border border-white/[0.05] shrink-0">
-                  <img
-                    src={"/userlogo.svg"}
-                    alt={"User"}
-                    className="object-cover"
-                  />
-                </Avatar>
-              )}
-              <div className="flex-1">
-                <div
-                  className={`rounded-lg px-4 py-3 ${
-                    message.sender === "Deplora"
-                      ? "bg-white/[0.02] border border-white/[0.03]"
-                      : "bg-white/[0.05]"
-                  }`}
-                >
-                  <p className="text-sm text-neutral-300 leading-relaxed">
-                    {message.content}
-                  </p>
+            <div key={index} className="flex-col gap-3 group pb-3 ">
+              <div className="flex items-center gap-2">
+                {message.sender === "User" && (
+                  <Avatar className="w-8 h-8 rounded-full overflow-hidden border border-white/[0.05] shrink-0">
+                    <img
+                      src={"/userlogo.svg"}
+                      alt={"User"}
+                      className="object-cover"
+                    />
+                  </Avatar>
+                )}
+                <div className="flex-1">
+                  <div
+                    className={`rounded-lg px-4 py-3 ${
+                      message.sender === "Deplora"
+                        ? "bg-gray-900/20"
+                        : "bg-white/[0.05]"
+                    }`}
+                  >
+                    <p className="text-sm text-gray-400 leading-relaxed font-medium">
+                      {message.content}
+                    </p>
+                  </div>
                 </div>
               </div>
+              {index === messages.length - 1 && loraStatus && (
+                <div className="mt-2">
+                  <AnimatedStatus />
+                </div>
+              )}
             </div>
-            {index === messages.length - 1 && loraStatus && (
-              <div className="mt-2">
-                <AnimatedStatus />
-              </div>
-            )}
           </div>
         ))}
       </div>
