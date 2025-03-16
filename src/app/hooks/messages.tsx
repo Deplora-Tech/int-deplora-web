@@ -155,13 +155,17 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
 
     load_conv(session_id).then(({ chat_history, current_plan }) => {
       const formattedMessages: Message[] = chat_history.map(
-        (chat: { role: string; message: string }): Message => ({
+        (chat: {
+          role: string;
+          message: string;
+          status: LoraStatus[];
+        }): Message => ({
           id: crypto.randomUUID(),
           content: chat.message,
           sender: chat.role === "You" ? "Deplora" : "User",
           timestamp: new Date(),
           userId: 1,
-          status: [],
+          status: chat.status,
         })
       );
 

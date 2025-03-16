@@ -109,11 +109,7 @@ export function Chat() {
               )}
               {message.sender === "Deplora" && (
                 <div className="mt-2">
-                  <AnimatedStatus statusList={ [
-                    LoraStatus.GATHERING_DATA, 
-                    LoraStatus.STARTING, 
-                    LoraStatus.COMPLETED
-                  ]} />
+                  <AnimatedStatus statusList={message.status} />
                 </div>
               )}
             </div>
