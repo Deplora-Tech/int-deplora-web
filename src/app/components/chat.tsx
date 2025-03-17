@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { useMessages } from "../hooks/messages";
 import { LoraStatus } from "../constants/Enums";
 import AnimatedStatus from "./animated-status";
+import { SecureInputForm } from "./SecureMessage";
 
 export function Chat() {
   const { messages, addMessage, loraStatus } = useMessages();
@@ -97,6 +98,9 @@ export function Chat() {
                     }`}
                   >
                     <p className="text-sm text-gray-400 leading-relaxed font-medium">
+                      {message.type === "secure" && (
+                        <SecureInputForm messageData={message} />
+                      )}
                       {message.content}
                     </p>
                   </div>

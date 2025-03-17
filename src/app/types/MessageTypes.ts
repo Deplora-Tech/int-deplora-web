@@ -7,6 +7,8 @@ export type Message = {
   timestamp: Date;
   userId: number;
   state?: LoraStatus[];
+  type?: "secure" | "standard";
+  fields?: string[];
 };
 
 export interface MessageContextType {
