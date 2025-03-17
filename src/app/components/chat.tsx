@@ -62,7 +62,7 @@ export function Chat() {
           sender: "User",
           timestamp: new Date(),
           userId: 1,
-          status: [],
+          state: [],
         });
       }, 1000);
       setInput("");
@@ -76,8 +76,8 @@ export function Chat() {
         className="flex-1 overflow-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
       >
         {messages.map((message, index) => (
-          <div className="flex-col gap-1" key={index}>
-            <div key={index} className="flex-col gap-3 group pb-3 ">
+          <div className="flex-col gap-1" key={message.id}>
+            <div key={message.id} className="flex-col gap-3 group pb-3 ">
               <div className="flex items-center gap-2">
                 {message.sender === "User" && (
                   <Avatar className="w-8 h-8 rounded-full overflow-hidden border border-white/[0.05] shrink-0">
@@ -107,11 +107,16 @@ export function Chat() {
                   <AnimatedStatus />
                 </div>
               )}
-              {message.sender === "Deplora" && (
-                <div className="mt-2">
-                  <AnimatedStatus statusList={message.status} />
-                </div>
-              )}
+              {message.sender === "Deplora" &&
+                message.state &&
+                message.state.length > 0 && (
+                  <div className="mt-2">
+                    <AnimatedStatus
+                      statesList={message.state}
+                      key={message.id}
+                    />
+                  </div>
+                )}
             </div>
           </div>
         ))}

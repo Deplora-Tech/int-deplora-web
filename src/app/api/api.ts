@@ -43,6 +43,7 @@ export const sendMessage = async (
 
 export const load_conv = async (session_id: string) => {
   const response = await api.get(`/get-chat-history/${session_id}`);
+  console.log(response);
   return response.data;
 };
 

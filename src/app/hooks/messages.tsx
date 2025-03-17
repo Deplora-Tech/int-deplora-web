@@ -103,29 +103,30 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       const messageContent = reply.processed_message.response;
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          sender: "Deplora",
-          content: messageContent,
-          timestamp: new Date(),
-          userId: 1,
-          status: [],
-        },
-      ]);
+      // setMessages((prev) => [
+      //   ...prev,
+      //   {
+      //     id: crypto.randomUUID(),
+      //     sender: "Deplora",
+      //     content: messageContent,
+      //     timestamp: new Date(),
+      //     userId: 1,
+      //     status: [],
+      //   },
+      // ]);
 
       const fileContents = reply.processed_message.file_contents;
       if (fileContents && Object.entries(fileContents).length > 0) {
         setFileContent(fileContents);
       }
 
-      updateMessageStatus(LoraStatus.COMPLETED);
       setLoraStatus(undefined);
+      setMessageHistory();
     } catch (error) {
       console.error("Error sending message:", error);
       updateMessageStatus(LoraStatus.FAILED);
       setLoraStatus(undefined);
+      setMessageHistory();
     }
   };
 
@@ -158,17 +159,17 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         (chat: {
           role: string;
           message: string;
-          status: LoraStatus[];
+          state: LoraStatus[];
         }): Message => ({
           id: crypto.randomUUID(),
           content: chat.message,
           sender: chat.role === "You" ? "Deplora" : "User",
           timestamp: new Date(),
           userId: 1,
-          status: chat.status,
+          state: chat.state,
         })
       );
-
+      console.log("Formatted messages:", formattedMessages);
       setMessages(formattedMessages);
       setFileContent(current_plan);
     });

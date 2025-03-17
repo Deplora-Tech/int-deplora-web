@@ -7,13 +7,13 @@ import { useMessages } from "../hooks/messages";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 interface AnimatedStatusProps {
-  statusList?: LoraStatus[];
+  statesList?: LoraStatus[];
 }
 
-const AnimatedStatus: React.FC<AnimatedStatusProps> = ({ statusList }) => {
+const AnimatedStatus: React.FC<AnimatedStatusProps> = ({ statesList }) => {
   let statuses: LoraStatus[] = [];
-  if (statusList) {
-    statuses = statusList;
+  if (statesList && statesList.length > 0) {
+    statuses = statesList;
   } else {
     statuses = useMessages().statuses;
   }

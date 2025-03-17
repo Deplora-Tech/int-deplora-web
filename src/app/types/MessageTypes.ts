@@ -6,7 +6,7 @@ export type Message = {
   sender: "User" | "Deplora";
   timestamp: Date;
   userId: number;
-  status?: LoraStatus[];
+  state?: LoraStatus[];
 };
 
 export interface MessageContextType {
