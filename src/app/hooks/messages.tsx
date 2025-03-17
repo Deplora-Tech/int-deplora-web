@@ -25,15 +25,17 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const [fileContent, setFileContent] = useState<Record<string, string>>({});
   const [messages, setMessages] = useState<Message[]>([]);
   const [loraStatus, setLoraStatus] = useState<LoraStatus | undefined>();
+  const [statuses, setStatuses] = useState<LoraStatus[]>([]);
   const websocketRef = useRef<WebSocket | null>(null);
   const [graph, setGraph] = useState<GraphType | null>(null);
   const { session_id, setSessionId } = useSession();
 
   useEffect(() => {
-
     if (!session_id) return;
 
-    const websocket = new WebSocket(`${process.env.NEXT_PUBLIC_API_URL}/ws/${session_id}`);
+    const websocket = new WebSocket(
+      `${process.env.NEXT_PUBLIC_API_URL}/ws/${session_id}`
+    );
     websocketRef.current = websocket;
 
     websocket.onopen = () => {
@@ -49,7 +51,9 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (Object.values(LoraStatus).includes(res.status)) {
         setLoraStatus(res.status);
+        setStatuses((prev) => [...prev, res.status]);
         console.log("Lora status:", res.status);
+        updateMessageStatus(res.status);
       }
 
       if (Object.values(GraphStatus).includes(res.status)) {
@@ -73,18 +77,21 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [session_id]);
 
   const addMessage = async (message: Omit<Message, "id">) => {
-
     if (!session_id) {
       console.error("Session ID not set.");
       setLoraStatus(LoraStatus.FAILED);
+      setStatuses((prev) => [...prev, LoraStatus.FAILED]);
       return;
     }
-    
+
     setLoraStatus(LoraStatus.STARTING);
+    // reset statuses
+    setStatuses([LoraStatus.STARTING]);
     const id = crypto.randomUUID();
     setMessages((prev) => [...prev, { ...message, id }]);
     setStatusMap((prev) => ({ ...prev, [id]: [LoraStatus.STARTING] }));
     setCurrentMessageId(id);
+    console.log("Current message ID Set to:", id);
 
     try {
       const reply = await sendMessage({
@@ -96,31 +103,37 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       });
 
       const messageContent = reply.processed_message.response;
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          sender: "Deplora",
-          content: messageContent,
-          timestamp: new Date(),
-          userId: 1,
-        },
-      ]);
+      // setMessages((prev) => [
+      //   ...prev,
+      //   {
+      //     id: crypto.randomUUID(),
+      //     sender: "Deplora",
+      //     content: messageContent,
+      //     timestamp: new Date(),
+      //     userId: 1,
+      //     status: [],
+      //   },
+      // ]);
 
       const fileContents = reply.processed_message.file_contents;
       if (fileContents && Object.entries(fileContents).length > 0) {
         setFileContent(fileContents);
       }
 
-      updateMessageStatus(LoraStatus.COMPLETED);
+      setLoraStatus(undefined);
+      setMessageHistory();
     } catch (error) {
       console.error("Error sending message:", error);
       updateMessageStatus(LoraStatus.FAILED);
+      setLoraStatus(undefined);
+      setMessageHistory();
     }
   };
 
   const updateMessageStatus = (status: LoraStatus) => {
     if (!currentMessageId) return;
+    console.log("Updating message status:", status);
+    console.log("Current message ID:", currentMessageId);
     setStatusMap((prev) => {
       const currentStatuses = prev[currentMessageId] || [];
       return {
@@ -128,8 +141,9 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         [currentMessageId]: [...currentStatuses, status],
       };
     });
-
+    console.log("Status map updated:", status);
     if (status === LoraStatus.COMPLETED || status === LoraStatus.FAILED) {
+      console.log("Clearing current message ID.");
       setCurrentMessageId(null);
     }
   };
@@ -137,20 +151,25 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const setMessageHistory = () => {
     if (!session_id) {
       return;
-    };
+    }
     console.log("Setting message history for session:", session_id);
 
     load_conv(session_id).then(({ chat_history, current_plan }) => {
-
-      const formattedMessages: Message[] = chat_history.map((chat: { role: string; message: string }): Message => ({
-
-        id: crypto.randomUUID(),
-        content: chat.message,
-        sender: chat.role === "You" ? "Deplora" : "User",
-        timestamp: new Date(),
-        userId: 1,
-      }));
-
+      const formattedMessages: Message[] = chat_history.map(
+        (chat: {
+          role: string;
+          message: string;
+          state: LoraStatus[];
+        }): Message => ({
+          id: crypto.randomUUID(),
+          content: chat.message,
+          sender: chat.role === "You" ? "Deplora" : "User",
+          timestamp: new Date(),
+          userId: 1,
+          state: chat.state,
+        })
+      );
+      console.log("Formatted messages:", formattedMessages);
       setMessages(formattedMessages);
       setFileContent(current_plan);
     });
@@ -167,6 +186,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         fileContent,
         setFileContent,
         loraStatus,
+        statuses,
         setMessageHistory,
         graph,
       }}

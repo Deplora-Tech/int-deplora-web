@@ -6,6 +6,9 @@ export type Message = {
   sender: "User" | "Deplora";
   timestamp: Date;
   userId: number;
+  state?: LoraStatus[];
+  type?: "secure" | "standard";
+  fields?: string[];
 };
 
 export interface MessageContextType {
@@ -17,6 +20,7 @@ export interface MessageContextType {
   fileContent: Record<string, string>;
   setFileContent: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   loraStatus?: LoraStatus;
+  statuses: LoraStatus[];
   setMessageHistory: () => void;
   graph: GraphType | null;
 }
