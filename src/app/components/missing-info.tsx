@@ -141,7 +141,9 @@ const MissingInformationForm = ({
       ? missingInformation
       : sampleData;
 
+  if (!isActive) currentStep === displayItems.length - 1;
   const currentQuestion = displayItems[currentStep];
+  // show first question;
 
   return (
     <div className="bg-black/30 text-white p-3 rounded-lg shadow-2xl mx-auto">
