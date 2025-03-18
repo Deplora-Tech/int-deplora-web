@@ -158,11 +158,12 @@ function EditorContent({
       <div className="relative">
         {/* Line Numbers */}
         <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col items-end pr-2 text-xs text-neutral-600 select-none bg-white/[0.02] gap-[2px]">
-          {Array.from({ length: content.split("\n").length }).map((_, i) => (
-            <div key={i} style={{ fontSize: "0.75rem" }}>
-              {i + 1}
-            </div>
-          ))}
+          {content &&
+            Array.from({ length: content.split("\n").length }).map((_, i) => (
+              <div key={i} style={{ fontSize: "0.75rem" }}>
+                {i + 1}
+              </div>
+            ))}
         </div>
         <div className="pl-12 ">
           <Editor

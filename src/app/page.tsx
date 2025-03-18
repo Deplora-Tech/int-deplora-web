@@ -40,5 +40,8 @@ export default function Home() {
   }
 
   // navigate to /chat/session_id
-  if (hasFiles && session_id) router.replace(`chat/${session_id}`);
+  if (hasFiles && session_id) {
+    router.push(`chat/${session_id}`);
+    router.refresh();
+  }
 }

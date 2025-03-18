@@ -94,7 +94,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("Current message ID Set to:", id);
 
     try {
-      const reply = await sendMessage({
+      await sendMessage({
         message: message.content,
         client_id: "1",
         project_id: "1",
@@ -102,7 +102,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         session_id: session_id,
       });
 
-      const messageContent = reply.processed_message.response;
+      // const messageContent = reply.processed_message.response;
       // setMessages((prev) => [
       //   ...prev,
       //   {
@@ -115,10 +115,10 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       //   },
       // ]);
 
-      const fileContents = reply.processed_message.file_contents;
-      if (fileContents && Object.entries(fileContents).length > 0) {
-        setFileContent(fileContents);
-      }
+      // const fileContents = reply.processed_message.file_contents;
+      // if (fileContents && Object.entries(fileContents).length > 0) {
+      //   setFileContent(fileContents);
+      // }
 
       setLoraStatus(undefined);
       setMessageHistory();

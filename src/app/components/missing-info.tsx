@@ -94,7 +94,7 @@ const MissingInformationForm = ({
         .join("\n");
 
       addMessage({
-        content: `Here are the missing details:\n\n${formattedDetails}`,
+        content: `Here are the completed "missing informations":\n\n${formattedDetails}`,
         sender: "User",
         timestamp: new Date(),
         userId: 1,
@@ -191,12 +191,15 @@ const MissingInformationForm = ({
               <option value="" disabled>
                 Select an option
               </option>
-              {currentQuestion.options &&
+              {currentQuestion.options && currentQuestion.options.length > 0 ? (
                 currentQuestion.options.map((option, optIndex) => (
                   <option key={optIndex} value={option.value}>
                     {option.description}
                   </option>
-                ))}
+                ))
+              ) : (
+                <option value="other">Other</option>
+              )}
             </select>
 
             {/* Show text input if "other" is selected */}

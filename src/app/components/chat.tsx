@@ -50,7 +50,7 @@ export function Chat() {
   }, [messages]);
 
   useEffect(() => {
-    if (messages.length > 0 || loraStatus !== undefined) {
+    if ((messages && messages.length > 0) || loraStatus !== undefined) {
       handleScrollToBottom();
     }
   }, [messages.length, loraStatus]);
@@ -77,7 +77,7 @@ export function Chat() {
         ref={containerRef}
         className="flex-1 overflow-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
       >
-        {messages.map((message, index) => (
+        {messages?.map((message, index) => (
           <div className="flex-col gap-1" key={message.id}>
             <div key={message.id} className="flex-col gap-3 group pb-3 ">
               <div className="flex items-center gap-2">
