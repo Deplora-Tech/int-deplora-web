@@ -2,7 +2,7 @@ import type { GraphType, LoraStatus } from "../constants/Enums";
 
 export type Message = {
   id: string;
-  content: string;
+  content: any;
   sender: "User" | "Deplora";
   timestamp: Date;
   userId: number;

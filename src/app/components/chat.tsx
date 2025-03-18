@@ -15,6 +15,7 @@ import { useMessages } from "../hooks/messages";
 import { LoraStatus } from "../constants/Enums";
 import AnimatedStatus from "./animated-status";
 import { SecureInputForm } from "./SecureMessage";
+import MissingInformationForm from "./missing-info";
 
 export function Chat() {
   const { messages, addMessage, loraStatus } = useMessages();
@@ -97,12 +98,17 @@ export function Chat() {
                         : "bg-white/[0.05]"
                     }`}
                   >
-                    <p className="text-sm text-gray-400 leading-relaxed font-medium">
-                      {message.type === "secure" && (
-                        <SecureInputForm messageData={message} />
+                    <div className="text-sm text-gray-400 leading-relaxed font-medium">
+                      {message.content.missing_information ? (
+                        <MissingInformationForm
+                          missingInformation={
+                            message.content.missing_information
+                          }
+                        />
+                      ) : (
+                        message.content
                       )}
-                      {message.content}
-                    </p>
+                    </div>
                   </div>
                 </div>
               </div>

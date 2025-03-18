@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 
 import { Popup } from "./popup"; // Import the Popup component
 import { useSession } from "../hooks/session";
+import MissingInformationForm from "./missing-info";
 
 export function LandingChat() {
   const [input, setInput] = useState("");
@@ -21,13 +22,12 @@ export function LandingChat() {
   const [showScrollButton, setShowScrollButton] = useState(false);
 
   const [showPopup, setShowPopup] = useState(false); // Popup state
-  const { setSessionId, session_id , project_id, setProjectId} = useSession();
+  const { setSessionId, session_id, project_id, setProjectId } = useSession();
   const isLoraActive =
     loraStatus &&
     loraStatus !== LoraStatus.COMPLETED &&
     loraStatus !== LoraStatus.FAILED;
 
-  
   useEffect(() => {
     if (!session_id) {
       const id = v4();
@@ -35,7 +35,6 @@ export function LandingChat() {
       console.log("Setting session id:", id);
     }
   }, []);
-
 
   const handleScrollToBottom = () => {
     containerRef.current?.scrollTo({
@@ -76,14 +75,15 @@ export function LandingChat() {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4  space-y-0 min-w-48">
-      {messages.length === 0 && (
+      {messages && messages.length === 0 && (
         <div className="space-y-4 text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl sm:text-6xl font-bold text-white">
-            What do you want to build?
+          <h1 className="text-4xl sm:text-6xl font-extrabold text-white leading-tight">
+            Generate and Execute Your Deployment Plan
           </h1>
-          <p className="text-lg text-neutral-400">
-            Prompt, run, edit, and deploy full-stack web apps.
+          <p className="text-lg text-neutral-400 mt-4">
+            Configure, prompt, and deploy your full-stack app with ease.
           </p>
+
           <Button
             variant="outline"
             className="group relative px-4 py-2 text-s bg-neutral-900/50 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-neutral-200 hover:text-white transition-all"
@@ -115,14 +115,25 @@ export function LandingChat() {
                   </Avatar>
                 )}
                 <div
-                  className={`flex-1 rounded-lg px-4 py-3 ${message.sender === "Deplora"
+                  className={`flex-1 rounded-lg px-4 py-3 ${
+                    message.sender === "Deplora"
                       ? "bg-white/[0.02]"
                       : "bg-white/[0.05]"
-                    }`}
+                  }`}
                 >
-                  <p className="text-sm text-neutral-200 leading-relaxed">
-                    {message.content}
-                  </p>
+                  <div className="text-sm text-gray-400 leading-relaxed font-medium w-full flex-col justify-center">
+                    {message.content.missing_information ? (
+                      <div className="w-full">
+                        <MissingInformationForm
+                          missingInformation={
+                            message.content.missing_information
+                          }
+                        />
+                      </div>
+                    ) : (
+                      message.content
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

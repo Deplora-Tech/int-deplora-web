@@ -16,7 +16,6 @@ import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import PreviewContent from "./PreviewContent";
 
-
 type FileTree = {
   [key: string]: FileTree | string;
 };
@@ -192,15 +191,19 @@ function EditorContent({
   );
 }
 
-export function CodeEditor({ setIsModalOpen }: { setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>> }) {
+export function CodeEditor({
+  setIsModalOpen,
+}: {
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const { fileContent, setFileContent } = useMessages();
   const [selectedFile, setSelectedFile] = useState<string>(
-    fileContent && typeof fileContent === "object" && Object.keys(fileContent).length > 0 
-      ? (Object.keys(fileContent)[0] as keyof typeof fileContent) 
+    fileContent &&
+      typeof fileContent === "object" &&
+      Object.keys(fileContent).length > 0
+      ? (Object.keys(fileContent)[0] as keyof typeof fileContent)
       : ""
   );
-  
-  
 
   return (
     <div className="gradient-border flex-1 flex flex-col min-w-0 h-[80vh]">
@@ -210,11 +213,13 @@ export function CodeEditor({ setIsModalOpen }: { setIsModalOpen: React.Dispatch<
         <TabsContent value="code" className="flex-1 p-0 mt-0 h-[76vh]">
           <div className="flex h-full divide-x divide-white/[0.02]">
             <div className="w-64 flex flex-col border-r border-white/[0.02]">
-              <FileList
-                fileContent={fileContent}
-                selectedFile={selectedFile}
-                setSelectedFile={setSelectedFile}
-              />
+              {fileContent && Object.entries(fileContent).length > 0 && (
+                <FileList
+                  fileContent={fileContent}
+                  selectedFile={selectedFile}
+                  setSelectedFile={setSelectedFile}
+                />
+              )}
             </div>
 
             <EditorContent
@@ -224,13 +229,14 @@ export function CodeEditor({ setIsModalOpen }: { setIsModalOpen: React.Dispatch<
             />
           </div>
         </TabsContent>
-        <TabsContent value="preview" className="flex-1 mt-0 max-h-[76vh] overflow-auto ">
+        <TabsContent
+          value="preview"
+          className="flex-1 mt-0 max-h-[76vh] overflow-auto "
+        >
           <PreviewContent />
         </TabsContent>
       </Tabs>
       <FooterActions />
-
-      
     </div>
   );
 }

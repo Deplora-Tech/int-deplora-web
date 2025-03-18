@@ -158,7 +158,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       const formattedMessages: Message[] = chat_history.map(
         (chat: {
           role: string;
-          message: string;
+          message: any;
           state: LoraStatus[];
         }): Message => ({
           id: crypto.randomUUID(),
