@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { useMessages } from "../hooks/messages";
+import { Message } from "../types/MessageTypes";
 
 const MissingInformationForm = ({
   missingInformation = [],
+  isActive,
 }: {
   missingInformation: {
     field: string;
     question?: string;
     options?: { value: string; description: string }[];
   }[];
+  isActive?: boolean;
 }) => {
   const { addMessage } = useMessages();
   const [isLoading, setLoading] = useState(false);

@@ -8,7 +8,6 @@ import { MessageProvider } from "./hooks/messages";
 import { PipelineProvider } from "./hooks/pipeline";
 import { SessionProvider } from "./hooks/session";
 import { useState } from "react";
-import Link from "next/link";
 
 const chatDetails = [
   { id: 1, title: "Kubernetes Cluster Setup" },
@@ -23,7 +22,6 @@ export default function RootLayout({
 }) {
   const [isChatHistoryOpen, setIsChatHistoryOpen] = useState(false);
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
-
   // Get the title of the selected chat
   const selectedChatTitle = chatDetails.find(
     (chat) => chat.id === selectedChatId
@@ -48,7 +46,9 @@ export default function RootLayout({
                   <div className="flex items-center justify-between w-full px-4">
                     <div className="flex items-center gap-4">
                       <span className="text-2xl font-bold bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">
-                        <Link href="/">Deplora</Link>
+                        <button onClick={() => (window.location.href = "/")}>
+                          Deplora
+                        </button>
                       </span>
 
                       {/* Stylish Current Chat Button */}

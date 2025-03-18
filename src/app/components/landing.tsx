@@ -125,6 +125,7 @@ export function LandingChat() {
                     {message.content.missing_information ? (
                       <div className="w-full">
                         <MissingInformationForm
+                          isActive={index === messages.length - 1}
                           missingInformation={
                             message.content.missing_information
                           }

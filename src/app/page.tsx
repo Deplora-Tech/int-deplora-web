@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
-import { Landing, LandingChat } from "./components/landing";
 import { useRouter } from "next/navigation";
-
+import { Landing, LandingChat } from "./components/landing";
 import { useMessages } from "./hooks/messages";
 import { useSession } from "./hooks/session";
-import { LoraStatus, statusMessages } from "./constants/Enums";
+import { LoraStatus } from "./constants/Enums";
 
 export default function Home() {
   const { loraStatus, fileContent } = useMessages();
@@ -27,6 +25,15 @@ export default function Home() {
       setHasFiles(true);
     }
   }, [fileContent]);
+
+  // Move navigation logic into useEffect
+  useEffect(() => {
+    if (hasFiles && session_id) {
+      router.push(`chat/${session_id}`);
+      router.refresh();
+    }
+  }, [hasFiles, session_id, router]);
+
   console.log("loraStatus", loraStatus);
   console.log("hasFiles", hasFiles);
   console.log("isChatOpen", isChatOpen);
@@ -39,9 +46,5 @@ export default function Home() {
     return <Landing />;
   }
 
-  // navigate to /chat/session_id
-  if (hasFiles && session_id) {
-    router.push(`chat/${session_id}`);
-    router.refresh();
-  }
+  return null;
 }

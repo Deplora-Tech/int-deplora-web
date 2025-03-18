@@ -104,6 +104,7 @@ export function Chat() {
                           missingInformation={
                             message.content.missing_information
                           }
+                          isActive={index === messages.length - 1}
                         />
                       ) : (
                         message.content
