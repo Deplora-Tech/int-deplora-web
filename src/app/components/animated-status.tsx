@@ -17,7 +17,6 @@ const AnimatedStatus: React.FC<AnimatedStatusProps> = ({ statesList }) => {
   } else {
     statuses = useMessages().statuses;
   }
-  console.log("Statuses:", statuses);
 
   if (!statuses || statuses.length === 0) {
     return null;

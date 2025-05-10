@@ -5,9 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { StageIcon } from "../stage-icon";
 import { StageConnector } from "../stage-connector";
 import { LogViewer } from "../log-viewer";
-import { PipelineState,  PipelineStage} from "../../types/PipelineTypes";
+import { PipelineState, PipelineStage } from "../../types/PipelineTypes";
 import { PipelineStageStatus } from "@/app/constants/Enums";
-import {usePipeline} from "../../hooks/pipeline";
+import { usePipeline } from "../../hooks/pipeline";
 import { useSession } from "@/app/hooks/session";
 
 export const metadata = {
@@ -16,59 +16,67 @@ export const metadata = {
 };
 
 
-
-// const INITIAL_PIPELINE_STATE: PipelineState = {
-//   stages: [
-//     {
-//       id: "build",
-//       name: "Build",
-//       status: PipelineStageStatus.PENDING,
-//       logs: [
-//         "Installing dependencies...",
-//         "Building project...",
-//         "Build successful!",
-//       ],
-//       duration: 120000,
-//     },
-//     {
-//       id: "test",
-//       name: "Test",
-//       status: PipelineStageStatus.SUCCESS,
-//       logs: ["Running unit tests...", "Testing API endpoints..."],
-//       duration: 180000,
-//     },
-//     { id: "deploy", name: "Deploy", status: PipelineStageStatus.IN_PROGRESS, logs: [], duration: 0 },
-//     { id: "verify", name: "Verify", status: PipelineStageStatus.FAILED, logs: [], duration: 0 },
-//   ],
-//   currentStage: 0,
-//   // startTime: Date.now(),
-//   estimatedDuration: 90 * 60 * 1000, // 90 minutes in milliseconds
-// };
-
 export default function PipelineDashboard() {
   const [selectedStage, setSelectedStage] = useState<PipelineStage | null>(null);
   const [elapsedTime, setElapsedTime] = useState<number>(0);
-  const {pipelineData} = usePipeline();
-  const {session_id} = useSession();
+  const { pipelineData } = usePipeline();
+  const { session_id } = useSession();
+  const [building, setBuilding] = useState(true);
+  // const []
 
-
+  // run every 2 seconds
   useEffect(() => {
-    let in_progress = pipelineData?.stages?.find((stage) => stage.status === PipelineStageStatus.IN_PROGRESS);
-
-    if (in_progress && !selectedStage){
-      setSelectedStage(in_progress);
-    }
-
-    if (!in_progress || !pipelineData?.timestamp) return; // Exit if timestamp is not available
+    if (!building) return;
 
     const interval = setInterval(() => {
-      const now = Date.now();
-      setElapsedTime(now - Number(pipelineData.timestamp));
-    }, 1000);
+      if (!building || !session_id || !pipelineData?.id) {
+        clearInterval(interval);
+        return;
+      }
+
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/status/${session_id}/${pipelineData.id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            console.error("Failed to post status");
+            return;
+          }
+          const status = await res.json();
+          setBuilding(status.building);
+          setElapsedTime(Date.now() - Number(pipelineData.timestamp));
+        })
+        .catch((err) => {
+          console.error("Error posting status:", err);
+        });
+
+    }, 5000); // every 5 seconds
 
     return () => clearInterval(interval);
-  
-  }, [pipelineData]);
+  }, [building, session_id, pipelineData?.id]);
+
+
+
+  // useEffect(() => {
+  //   let in_progress = pipelineData?.stages?.find((stage) => stage.status === PipelineStageStatus.IN_PROGRESS);
+
+  //   if (in_progress && !selectedStage) {
+  //     setSelectedStage(in_progress);
+  //   }
+
+  //   if (!in_progress || !pipelineData?.timestamp) return; // Exit if timestamp is not available
+
+  //   const interval = setInterval(() => {
+  //     const now = Date.now();
+  //     setElapsedTime(now - Number(pipelineData.timestamp));
+  //   }, 1000);
+
+  //   return () => clearInterval(interval);
+
+  // }, [pipelineData]);
 
   const formatTime = (ms: number): string => {
     const minutes = Math.floor(ms / 60000);
@@ -90,8 +98,8 @@ export default function PipelineDashboard() {
   };
 
   return (
-  <Card className="w-full bg-gray-950 text-white border-gray-800">
-    <CardHeader>
+    <Card className="w-full bg-gray-950 text-white border-gray-800">
+      <CardHeader>
         <CardTitle className="text-2xl font-bold">
           CI Pipeline Dashboard
         </CardTitle>
