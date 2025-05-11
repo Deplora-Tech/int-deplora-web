@@ -212,7 +212,7 @@ export function LandingChat() {
           <div>
             <div className="mt-8 flex flex-wrap gap-2 justify-center">
               {[
-                "Generate a Docker deployment plan",
+                "Generate a Docker deployment plan for aws",
                 "Create a Kubernetes cluster setup",
                 "Automate deployment with Terraform",
                 "Set up CI/CD with Jenkins",
