@@ -23,6 +23,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const [statusMap, setStatusMap] = useState<Record<string, LoraStatus[]>>({});
   const [currentMessageId, setCurrentMessageId] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<Record<string, string>>({});
+  const [allPipelineData, setPipelineData] = useState<any>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loraStatus, setLoraStatus] = useState<LoraStatus | undefined>();
   const [statuses, setStatuses] = useState<LoraStatus[]>([]);
@@ -154,7 +155,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     console.log("Setting message history for session:", session_id);
 
-    load_conv(session_id).then(({ chat_history, current_plan }) => {
+    load_conv(session_id).then(({ chat_history, current_plan, pipeline_data }) => {
       const formattedMessages: Message[] = chat_history.map(
         (chat: {
           role: string;
@@ -163,15 +164,16 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         }): Message => ({
           id: crypto.randomUUID(),
           content: chat.message,
-          sender: chat.role === "You" ? "Deplora" : "User",
+          sender: chat.role === "You" ? "Deplora" : chat.role,
           timestamp: new Date(),
           userId: 1,
           state: chat.state,
         })
       );
-      console.log("Formatted messages:", formattedMessages);
+      console.log("Pipelines:", pipeline_data);
       setMessages(formattedMessages);
       setFileContent(current_plan);
+      setPipelineData(pipeline_data);
     });
   };
 
@@ -189,6 +191,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         statuses,
         setMessageHistory,
         graph,
+        allPipelineData,
       }}
     >
       {children}
