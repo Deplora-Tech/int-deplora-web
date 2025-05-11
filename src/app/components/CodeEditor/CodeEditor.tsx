@@ -15,6 +15,7 @@ import { useMessages } from "../../../app/hooks/messages";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import PreviewContent from "./PreviewContent";
+import { useSession } from "@/app/hooks/session";
 
 type FileTree = {
   [key: string]: FileTree | string;
@@ -146,15 +147,48 @@ function EditorContent({
 }) {
   const content = fileContent[selectedFile];
   const fileType = detectFileType(selectedFile);
-  const handleContentChange = (newContent: string) => {
+  const { session_id } = useSession();
+  const [saving, setSaving] = useState(false);
+
+  const handleContentChange = async (newContent: string) => {
+  try {
+    setSaving(true);
     setFileContent({
       ...fileContent,
       [selectedFile]: newContent,
     });
-  };
+
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/update-file`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        session_id,
+        file_path: selectedFile,
+        file_content: newContent,
+      }),
+    });
+
+    if (!res.ok) {
+      console.error("Failed to update file");
+      return;
+    }
+
+    console.log("File updated successfully");
+  } catch (error) {
+    console.error("Error updating file:", error);
+  } finally {
+    // sleep 1 sec before setting saving to false
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setSaving(false);
+  }
+};
+
 
   return (
-    <ScrollArea className="h-[calc(100%-40px)] w-full bg-gradient-to-b from-[#121212] to-black">
+    <ScrollArea className="h-[calc(100%-40px)] w-full bg-gray-950">
+      
       <div className="relative">
         {/* Line Numbers */}
         <div className="absolute left-0 top-0 bottom-0 w-12 flex flex-col items-end pr-2 text-xs text-neutral-600 select-none bg-white/[0.02] gap-[2px]">
@@ -187,6 +221,9 @@ function EditorContent({
             className="bg-none text-gray-400 focus:outline-none border-none hover:border-none"
           />
         </div>
+      </div>
+      <div className="w-full bg-gray-700 text-xs absolute bottom-0 left-0 right-0 text-right px-2">
+        {saving && "Saving"}
       </div>
     </ScrollArea>
   );
