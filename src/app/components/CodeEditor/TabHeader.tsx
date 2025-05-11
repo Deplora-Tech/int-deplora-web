@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { Button } from "../../components/ui/button";
 import { useSession } from "../../hooks/session";
 import { GitCommit } from "lucide-react";
+import { useMessages } from "@/app/hooks/messages";
 
 interface TabsHeaderProps {
   setIsModalOpen: (isOpen: boolean) => void;
@@ -10,13 +11,24 @@ interface TabsHeaderProps {
 
 export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
   const { session_id } = useSession();
+  const {setMessageHistory} = useMessages();
 
   const handleDeploy = () => {
     // Show the modal popup
     setIsModalOpen(true);
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/execute/${session_id}`, {
       method: 'POST',
-    });
+    }).then((res) => {
+      if (!res.ok) {
+        console.error("Failed to post status");
+        return;
+      }
+      setMessageHistory();
+    }
+    ).catch((err) => {
+      console.error("Error posting status:", err);
+    }
+    );
   };
 
 
