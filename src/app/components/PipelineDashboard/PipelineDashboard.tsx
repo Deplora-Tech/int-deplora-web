@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import { StageIcon } from "../stage-icon";
-import { StageConnector } from "../stage-connector";
-import { LogViewer } from "../log-viewer";
+import { StageIcon } from "@/app/components/PipelineDashboard/stage-icon";
+import { StageConnector } from "@/app/components/PipelineDashboard/stage-connector";
+import { LogViewer } from "@/app/components/PipelineDashboard/log-viewer";
 import { PipelineState, PipelineStage } from "../../types/PipelineTypes";
 import { PipelineStageStatus } from "@/app/constants/Enums";
 import { usePipeline } from "../../hooks/pipeline";
