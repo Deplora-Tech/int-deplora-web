@@ -1,8 +1,8 @@
 import { X } from "lucide-react";
-import { Button } from "./ui/button";
-import { ScrollArea } from "./ui/scroll-area";
-import { PipelineStage } from "../types/PipelineTypes";
-import { usePipeline } from "../hooks/pipeline";
+import { Button } from "@/app/components/ui/button";
+import { ScrollArea } from "@/app/components/ui/scroll-area";
+import { PipelineStage } from "@/app/types/PipelineTypes";
+import { usePipeline } from "@/app/hooks/pipeline";
 import AnsiToHtml from "ansi-to-html";
 
 // Create a converter instance with optional configuration.
