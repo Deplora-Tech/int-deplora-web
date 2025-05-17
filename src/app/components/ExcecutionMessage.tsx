@@ -6,20 +6,44 @@ import { useMessages } from "../hooks/messages";
 
 interface SecureInputFormProps {
   message: Message;
+  setPipelineData: (data: any) => void;
 }
 
-export function ExcecutionMessage({ message }: SecureInputFormProps) {
-  const { allPipelineData } = useMessages();
+export function ExcecutionMessage({ message, setPipelineData }: SecureInputFormProps) {
+  const { allPipelineData , addMessage} = useMessages();
   const pipelineData = useMemo(() => {
-    return allPipelineData[message.content];
-  }, [allPipelineData, message.id]);
+    let data = allPipelineData[message.content]
+    if (data){
+      data["id"] = message.content
+    return data;
+    }
+  }, [allPipelineData, message.content]);
 
   const [open, setOpen] = useState(false);
+  
+  const isFailed = pipelineData?.stages?.some((stage: any) => stage.status === "FAILED");
+  const firstFailedStage = pipelineData?.stages?.find((stage: any) => stage.status === "FAILED");
 
   const renderStatusIcon = (status: string) => {
     if (status === "SUCCESS") return <CheckCircle className="text-green-500 w-4 h-4" />;
     if (status === "FAILED") return <XCircle className="text-red-500 w-4 h-4" />;
     return <Clock className="text-yellow-500 w-4 h-4" />;
+  };
+
+
+  const handleFix = () => {
+
+
+      setTimeout(() => {
+        addMessage({
+          content: `The following stage failed:\n\n${firstFailedStage?.name}\n\nLogs:\n${firstFailedStage?.logs?.join('\n')}\n\nCan you help fix this issue?`,
+          sender: "User",
+          timestamp: new Date(),
+          userId: 1,
+          state: [],
+        });
+      }, 1000);
+
   };
 
   return (
@@ -58,13 +82,24 @@ export function ExcecutionMessage({ message }: SecureInputFormProps) {
           open && <p className="text-sm text-gray-400">No pipeline data available.</p>
         )}
       </CardContent>
-      {/* View Details Button */}
-      <div className="flex justify-end px-6 pb-4">
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-2 px-6 pb-4">
+        {isFailed && (
+          <button
+            className="bg-red-600 hover:bg-red-700 text-white text-sm font-medium py-2 px-4 rounded transition"
+            onClick={handleFix}
+          >
+            Fix
+          </button>
+        )}
         <button
-          className="bg-cyan-600 hover:bg-cyan-700 text-white text-sm font-medium py-2 px-4 rounded transition"
+          className={`${
+            isFailed
+              ? "bg-gray-600 hover:bg-gray-700"
+              : "bg-cyan-600 hover:bg-cyan-700"
+          } text-white text-sm font-medium py-2 px-4 rounded transition`}
           onClick={() => {
-            // TODO: Add your view details logic here
-            alert("View details clicked!");
+            setPipelineData(message.content);
           }}
         >
           View Details

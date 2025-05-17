@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { Button } from "@/app/components/ui/button";
 import { ScrollArea } from "@/app/components/ui/scroll-area";
-import { PipelineStage } from "@/app/types/PipelineTypes";
+import { PipelineStage, PipelineState } from "@/app/types/PipelineTypes";
 import { usePipeline } from "@/app/hooks/pipeline";
 import AnsiToHtml from "ansi-to-html";
 
@@ -16,12 +16,22 @@ const converter = new AnsiToHtml({
 interface LogViewerProps {
   stage: PipelineStage;
   onClose: () => void;
+  pipelineData?: PipelineState;
 }
 
-export function LogViewer({ stage, onClose }: LogViewerProps) {
-  const { pipelineData } = usePipeline();
+export function LogViewer({ stage, onClose, pipelineData: propPipelineData }: LogViewerProps) {
+  const { pipelineData : hookPipelineData } = usePipeline();
+  const pipelineData = propPipelineData || hookPipelineData;
+  // Split long log lines (> 130 chars) into multiple lines
   const stageLogs =
-    pipelineData.stages.find((s) => s.name === stage.name)?.logs || [];
+    pipelineData.stages
+      ?.find((s) => s.name === stage.name)
+      ?.logs
+      ?.flatMap((log) =>
+        log.length > 130
+          ? log.match(/.{1,130}/g) // split into 130-char chunks
+          : [log]
+      ) || [];
 
   return (
     <div className="mt-6 bg-gray-900 rounded-lg border border-gray-800">

@@ -19,7 +19,11 @@ import MissingInformationForm from "./missing-info";
 import NormalMessage from "./NormalMessage";
 import { ExcecutionMessage } from "./ExcecutionMessage";
 
-export function Chat() {
+interface ChatProps {
+  setPipelineData: (data: any) => void;
+}
+
+export function Chat({ setPipelineData }: ChatProps) {
   const { messages, addMessage, loraStatus } = useMessages();
   const [input, setInput] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -80,7 +84,7 @@ export function Chat() {
         className="flex-1 overflow-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
       >
         {messages?.map((message, index) =>
-          message.sender === "executor" ? <ExcecutionMessage key={index} message={message}  /> : <NormalMessage key={index} message={message} index={index} />
+          message.sender === "executor" ? <ExcecutionMessage key={index} message={message} setPipelineData={setPipelineData} /> : <NormalMessage key={index} message={message} index={index} />
         )}
         
       </div>
