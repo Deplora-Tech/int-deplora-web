@@ -2,10 +2,14 @@ import type { GraphType, LoraStatus } from "../constants/Enums";
 
 export type Message = {
   id: string;
-  content: string;
-  sender: "User" | "Deplora";
+  content: any;
+  sender: "User" | "Deplora" | String;
   timestamp: Date;
   userId: number;
+  state?: LoraStatus[];
+  type?: "secure" | "standard";
+  fields?: string[];
+  variation?: "chat" | "pipeline" | undefined;
 };
 
 export interface MessageContextType {
@@ -17,6 +21,8 @@ export interface MessageContextType {
   fileContent: Record<string, string>;
   setFileContent: React.Dispatch<React.SetStateAction<Record<string, string>>>;
   loraStatus?: LoraStatus;
+  statuses: LoraStatus[];
   setMessageHistory: () => void;
   graph: GraphType | null;
+  allPipelineData: any;
 }

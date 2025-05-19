@@ -5,8 +5,8 @@ import React, {
     useRef,
     useState,
 } from "react";
-import { ExcecutionStatus } from "../constants/Enums";
-import type { PipelineData, PipelineContextType } from "../types/PipelineTypes";
+import { ExcecutionStatus, PipelineStageStatus } from "../constants/Enums";
+import { PipelineState, PipelineContextType } from "../types/PipelineTypes";
 import { useSession } from "./session";
 
 const PipelineContext = createContext<PipelineContextType | undefined>(
@@ -16,7 +16,7 @@ const PipelineContext = createContext<PipelineContextType | undefined>(
 export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
-    const [pipelineData, setPipelineData] = useState<PipelineData | null>(null);
+    const [pipelineData, setPipelineData] = useState<PipelineState | null>(null);
     const websocketRef = useRef<WebSocket | null>(null);
 
     const { session_id } = useSession();
@@ -24,7 +24,7 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
     useEffect(() => {
 
         if (!session_id) return;
-        
+
         try {
             const websocket = new WebSocket(`${process.env.NEXT_PUBLIC_API_URL}/pipeline-ws/${session_id}`);
             websocketRef.current = websocket;
@@ -34,19 +34,54 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
             };
 
             websocket.onmessage = (event) => {
-                console.log("Pipeline event data:", event.data);
+                // console.log("Pipeline event data:", event.data);
                 const res = JSON.parse(event.data);
 
-                if (Object.values(ExcecutionStatus).includes(res.status)) {
-                    console.log("Pipeline execution stage:", res.status);
-                }
+                setPipelineData((prevData) => {
 
-                if (res.status === ExcecutionStatus.INITIALIZE) {
-                    let data = JSON.parse(res.data);
-                    data["currentStage"] = data.stages.length;
-                    setPipelineData(data);
-                    console.log("Pipeline dataaaa:", data);
-                }
+                    const currentData = prevData ?? ({} as PipelineState);
+
+                    if (res.status === ExcecutionStatus.INITIALIZE) {
+                        let data = JSON.parse(res.data);
+                        
+                        let stages = data["stages"].map((stage: any) => {
+                            return {
+                                'id': stage,
+                                'name': stage,
+                                'status': PipelineStageStatus.PENDING,
+                                'logs': [
+                                ],
+                            };
+                        });
+                        data["stages"] = stages;
+                        data["currentStage"] = 0;
+                        console.log("Pipeline data:", data);
+                        setPipelineData(data);
+                    }
+                    else if (res.status === ExcecutionStatus.PROCESSING) {
+                        let data = JSON.parse(res.data);
+                        let stages = currentData?.stages ?? [];
+                        for (let updatedStage of data.stages) {
+                            let stageIndex = stages.findIndex((stage) => stage.name === updatedStage.name);
+                            if (stageIndex !== -1) {
+                                stages[stageIndex] = updatedStage;
+                            }
+                        }
+
+
+                        setPipelineData({
+                            ...currentData,
+                            stages: stages,
+                            currentStage: data.currentStage,
+                            id: currentData?.id ?? "",
+                            estimatedDuration: data?.estimatedDuration,
+                            duration: data?.duration,
+                            timestamp: data?.timestamp,
+                        });
+                    }
+                    return currentData;
+                });
+
             };
 
             websocket.onclose = () => {
@@ -71,7 +106,7 @@ export const PipelineProvider: React.FC<{ children: React.ReactNode }> = ({
     return (
         <PipelineContext.Provider
             value={{
-                pipelineData: pipelineData ?? {} as PipelineData
+                pipelineData: pipelineData ?? {} as PipelineState
             }}
         >
             {children}

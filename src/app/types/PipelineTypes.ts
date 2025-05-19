@@ -1,24 +1,25 @@
-import { ExcecutionStatus } from "../constants/Enums";
+import { PipelineStageStatus } from "../constants/Enums";
 
-interface Stage {
+export interface PipelineStage {
     id: string;
     name: string;
-    status: string;
+    status: PipelineStageStatus;
     duration: number;
     logs?: string[];
 }
 
 // Represents a single pipeline data entry
-export interface PipelineData {
+export interface PipelineState {
   id: string;
-  stages: Stage[];
+  stages: PipelineStage[];
   estimatedDuration: number;
   duration: number;
   timestamp: Date;
   currentStage: number;
+  building: boolean;
 }
 
 // Represents the context type for pipeline management
 export interface PipelineContextType {
-  pipelineData: PipelineData;
+  pipelineData: PipelineState;
 }
