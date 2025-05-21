@@ -9,10 +9,15 @@ import { LoraStatus } from "./constants/Enums";
 
 export default function Home() {
   const { loraStatus, fileContent } = useMessages();
-  const { session_id } = useSession();
+  const { session_id , setClientId} = useSession();
   const [hasFiles, setHasFiles] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setClientId("user1")
+  }
+  , []);
 
   useEffect(() => {
     if (loraStatus === LoraStatus.STARTING) {

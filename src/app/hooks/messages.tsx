@@ -14,6 +14,7 @@ import {
 } from "../constants/Enums";
 import type { Message, MessageContextType } from "../types/MessageTypes";
 import { useSession } from "./session";
+import { GitRepo } from "../types/SessionType";
 
 const MessageContext = createContext<MessageContextType | undefined>(undefined);
 
@@ -29,7 +30,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const [statuses, setStatuses] = useState<LoraStatus[]>([]);
   const websocketRef = useRef<WebSocket | null>(null);
   const [graph, setGraph] = useState<GraphType | null>(null);
-  const { session_id, setSessionId } = useSession();
+  const { session_id, client_id, project } = useSession();
 
   useEffect(() => {
     if (!session_id) return;
@@ -97,8 +98,8 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await sendMessage({
         message: message.content,
-        client_id: "1",
-        project_id: "1",
+        client_id: client_id ?? "",
+        project: project ?? {} as GitRepo,
         organization_id: "1",
         session_id: session_id,
       });
