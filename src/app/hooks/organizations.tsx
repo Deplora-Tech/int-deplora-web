@@ -1,5 +1,5 @@
 // write a organizations provides hook that returns the organizations
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { useSession } from "./session";
 import { getOrganizations, createOrganization } from "../api/api";
 import { useUser } from "./user";
@@ -9,22 +9,25 @@ type Organization = {
   name: string;
   client_id: string;
   description: string;
-  created_at: string;
-  updated_at: string;
 };
 
 const organizationsContext = createContext<{
   organizations: Organization[];
   createOrg: (name: string, description: string) => Promise<void>;
-  org: string;
-  setOrg: (org: string) => void;
+  org: Organization | null;
+  setOrg: (org: Organization | null) => void;
 }>({} as any);
 
 export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
-  const [org, setOrg] = useState("");
+  const [org, setOrg] = useState<Organization | null>({
+    id: "1",
+    name: "Default Organization",
+    client_id: "1",
+    description: "This is the default organization",
+  });
   const { user } = useUser();
 
   const createOrg = async (name: string, description: string) => {
@@ -42,6 +45,10 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
+    const orgId = localStorage.getItem("org");
+    if (orgId) {
+      setOrg(organizations.find((o) => o.id === orgId) || null);
+    }
     const fetchOrganizations = async () => {
       try {
         if (!user) return;
@@ -67,4 +74,14 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
     </organizationsContext.Provider>
   );
+};
+
+export const useOrganizations = () => {
+  const context = useContext(organizationsContext);
+  if (!context) {
+    throw new Error(
+      "useOrganizations must be used within a OrganizationProvider"
+    );
+  }
+  return context;
 };
