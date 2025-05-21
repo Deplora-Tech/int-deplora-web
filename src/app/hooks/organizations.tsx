@@ -16,12 +16,15 @@ type Organization = {
 const organizationsContext = createContext<{
   organizations: Organization[];
   createOrg: (name: string, description: string) => Promise<void>;
+  org: string;
+  setOrg: (org: string) => void;
 }>({} as any);
 
 export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [org, setOrg] = useState("");
   const { user } = useUser();
 
   const createOrg = async (name: string, description: string) => {
@@ -58,7 +61,9 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   }
   return (
-    <organizationsContext.Provider value={{ organizations, createOrg }}>
+    <organizationsContext.Provider
+      value={{ organizations, createOrg, setOrg, org }}
+    >
       {children}
     </organizationsContext.Provider>
   );
