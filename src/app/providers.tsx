@@ -5,20 +5,17 @@ import { MessageProvider } from "./hooks/messages";
 import { PipelineProvider } from "./hooks/pipeline";
 import { SessionProvider } from "./hooks/session";
 import { UserProvider } from "./hooks/user";
-import { ProjectProvider } from "./hooks/projects";
+import { OrganizationProvider } from "./hooks/organizations";
 
-/**
- * Centralized providers component that wraps the application with all necessary context providers
- */
 export default function Providers({ children }: { children: ReactNode }) {
   return (
     <UserProvider>
       <SessionProvider>
-        <ProjectProvider>
+        <OrganizationProvider>
           <MessageProvider>
             <PipelineProvider>{children}</PipelineProvider>
           </MessageProvider>
-        </ProjectProvider>
+        </OrganizationProvider>
       </SessionProvider>
     </UserProvider>
   );

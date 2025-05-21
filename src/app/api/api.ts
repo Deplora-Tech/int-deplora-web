@@ -23,6 +23,11 @@ type ApiResponse = {
   };
 };
 
+type Organization = {
+  client_id: string;
+  name: string;
+  description: string;
+};
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
@@ -53,21 +58,15 @@ export const getGraph = async (request: GraphRequestBody) => {
   return response.data;
 };
 
-export const getProjects = async (client_id: string) => {
-  const response = await api.get(`/projects/${client_id}`);
+export const getOrganizations = async (client_id: string) => {
+  const response = await api.post(`/get-organizations/${client_id}`);
   console.log(response.data);
   return response.data;
 };
 
-export const createProject = async (
-  client_id: string,
-  project_name: string,
-  project_description: string
-) => {
-  const response = await api.post("/projects", {
-    client_id,
-    project_name,
-    project_description,
+export const createOrganization = async (organization: Organization) => {
+  const response = await api.post("/create-organization", {
+    ...organization,
   });
 
   return response.data;
