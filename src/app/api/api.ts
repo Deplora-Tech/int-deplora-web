@@ -52,3 +52,23 @@ export const getGraph = async (request: GraphRequestBody) => {
   console.log(response.data);
   return response.data;
 };
+
+export const getProjects = async (client_id: string) => {
+  const response = await api.get(`/projects/${client_id}`);
+  console.log(response.data);
+  return response.data;
+};
+
+export const createProject = async (
+  client_id: string,
+  project_name: string,
+  project_description: string
+) => {
+  const response = await api.post("/projects", {
+    client_id,
+    project_name,
+    project_description,
+  });
+
+  return response.data;
+};
