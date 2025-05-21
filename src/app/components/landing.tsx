@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowRight, CircleStop, Link } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useMessages } from "../hooks/messages";
@@ -18,8 +18,9 @@ import MissingInformationForm from "./missing-info";
 export function LandingChat() {
   const [input, setInput] = useState("");
   const { messages, addMessage, loraStatus } = useMessages();
-  const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [containerElement, setContainerElement] =
+    useState<HTMLDivElement | null>(null);
 
   const [showPopup, setShowPopup] = useState(false); // Popup state
   const { setSessionId, session_id, project_id, setProjectId } = useSession();
@@ -36,28 +37,32 @@ export function LandingChat() {
     }
   }, []);
 
+  // Safely scroll to bottom
   const handleScrollToBottom = () => {
-    containerRef.current?.scrollTo({
-      top: containerRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  };
-
-  const handleScroll = () => {
-    if (containerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-      setShowScrollButton(scrollHeight - scrollTop > clientHeight + 10);
+    if (containerElement) {
+      containerElement.scrollTo({
+        top: containerElement.scrollHeight,
+        behavior: "smooth",
+      });
     }
   };
 
+  // Safely check if we should show scroll button
+  const handleScroll = (e: any) => {
+    const target = e.target as HTMLDivElement;
+    if (target) {
+      const { scrollTop, scrollHeight, clientHeight } = target;
+      const shouldShowButton = scrollHeight - scrollTop > clientHeight + 10;
+      setShowScrollButton(shouldShowButton);
+    }
+  };
+
+  // Scroll to bottom whenever messages change
   useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      handleScroll();
-      container.addEventListener("scroll", handleScroll);
-      return () => container.removeEventListener("scroll", handleScroll);
+    if (containerElement && messages.length > 0) {
+      containerElement.scrollTop = containerElement.scrollHeight;
     }
-  }, [messages]);
+  }, [messages.length, containerElement]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,7 +105,8 @@ export function LandingChat() {
       <div className="w-full max-w-4xl mx-auto">
         {messages.length > 0 && (
           <div
-            ref={containerRef}
+            ref={(el) => setContainerElement(el)}
+            onScroll={handleScroll}
             className="flex-1 overflow-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent max-h-[70vh] bg-neutral-900/50 rounded-lg"
           >
             {messages.map((message, index) => (
@@ -143,7 +149,7 @@ export function LandingChat() {
 
         {showScrollButton && (
           <button
-            className="absolute left-1/2 transform -tranneutral-x-1/2 tranneutral-y-1 bg-blue-500 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg opacity-60 hover:opacity-100 transition-opacity"
+            className="absolute left-1/2 transform -translate-x-1/2 bg-blue-500 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg opacity-60 hover:opacity-100 transition-opacity"
             onClick={handleScrollToBottom}
             style={{ bottom: "18%" }}
           >
