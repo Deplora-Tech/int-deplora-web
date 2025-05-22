@@ -4,16 +4,25 @@ import { useSession } from "./session";
 import { getOrganizations, createOrganization } from "../api/api";
 import { useUser } from "./user";
 
-type Organization = {
+export type Organization = {
   id: string;
   name: string;
   client_id: string;
   description: string;
+  api_key?: string;
+  secret_key?: string;
+  environment_variables?: Record<string, string>;
+  regions?: string[];
+  deployment_settings?: {
+    default_region?: string;
+    auto_deploy?: boolean;
+  };
 };
 
 const organizationsContext = createContext<{
   organizations: Organization[];
   createOrg: (name: string, description: string) => Promise<void>;
+  updateOrg: (orgId: string, updates: Partial<Organization>) => Promise<void>;
   org: Organization | null;
   setOrg: (org: Organization | null) => void;
 }>({} as any);
@@ -21,13 +30,15 @@ const organizationsContext = createContext<{
 export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [org, setOrg] = useState<Organization | null>({
     id: "1",
     name: "Default Organization",
     client_id: "1",
     description: "This is the default organization",
   });
+  const [organizations, setOrganizations] = useState<Organization[]>([
+    org as Organization,
+  ]);
   const { user } = useUser();
 
   const createOrg = async (name: string, description: string) => {
@@ -41,6 +52,27 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
       setOrganizations((prev) => [...prev, data]);
     } catch (error) {
       console.error("Error creating organization:", error);
+    }
+  };
+  const updateOrg = async (orgId: string, updates: Partial<Organization>) => {
+    try {
+      const { updateOrganization } = await import("../api/api");
+      const response = await updateOrganization(orgId, updates);
+
+      // Update organizations list with the updated organization
+      setOrganizations((prev) =>
+        prev.map((org) => (org.id === orgId ? { ...org, ...updates } : org))
+      );
+
+      // If currently selected org is being updated, update it too
+      if (org?.id === orgId) {
+        setOrg((prev) => (prev ? { ...prev, ...updates } : null));
+      }
+
+      return response;
+    } catch (error) {
+      console.error("Error updating organization:", error);
+      throw error;
     }
   };
 
@@ -69,7 +101,7 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
   }
   return (
     <organizationsContext.Provider
-      value={{ organizations, createOrg, setOrg, org }}
+      value={{ organizations, createOrg, updateOrg, setOrg, org }}
     >
       {children}
     </organizationsContext.Provider>

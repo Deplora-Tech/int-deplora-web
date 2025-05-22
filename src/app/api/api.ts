@@ -24,9 +24,18 @@ type ApiResponse = {
 };
 
 type Organization = {
+  id?: string;
   client_id: string;
   name: string;
   description: string;
+  api_key?: string;
+  secret_key?: string;
+  environment_variables?: Record<string, string>;
+  regions?: string[];
+  deployment_settings?: {
+    default_region?: string;
+    auto_deploy?: boolean;
+  };
 };
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -67,6 +76,17 @@ export const getOrganizations = async (client_id: string) => {
 export const createOrganization = async (organization: Organization) => {
   const response = await api.post("/create-organization", {
     ...organization,
+  });
+
+  return response.data;
+};
+
+export const updateOrganization = async (
+  organizationId: string,
+  updates: Partial<Organization>
+) => {
+  const response = await api.put(`/organizations/${organizationId}`, {
+    ...updates,
   });
 
   return response.data;
