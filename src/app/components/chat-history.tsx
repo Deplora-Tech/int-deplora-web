@@ -31,16 +31,10 @@ export function ChatHistorySidebar({
   const [isAddingChat, setIsAddingChat] = useState(false);
   const { setMessageHistory, chatList } = useMessages();
 
-  // Handler for creating a brand new chat
   const handleCreateNewChat = () => {
-    // Reset the selected chat and close the add form if open
     setSelectedChatId(null);
     setIsAddingChat(false);
-
-    // Reset the message history
     setMessageHistory();
-
-    // In a real app, you would create a new session via API
   };
 
   return (
@@ -99,7 +93,9 @@ export function ChatHistorySidebar({
                   ? "bg-gradient-to-r from-blue-500/20 to-teal-400/20 text-white border border-white/10"
                   : "text-white/80 hover:text-white hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-teal-400/10"
               )}
-              onClick={() => {}}
+              onClick={() => {
+                window.location.href = `/chat/${chat.session_id}`;
+              }}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-teal-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative z-10 flex items-center gap-3 w-full">
@@ -131,9 +127,7 @@ export function ChatHistorySidebar({
                         : "text-white/60 group-hover:text-white/80"
                     )}
                     title="Last message preview"
-                  >
-                    Last message preview
-                  </span>
+                  ></span>
                 </div>
               </div>
             </Button>
