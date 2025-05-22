@@ -6,9 +6,9 @@ import { ChatHistorySidebar } from "../../chat-history";
 import { Dropdown } from "../../ui/dropdown";
 
 interface ChatSelectorProps {
-  selectedChatId: number | null;
-  setSelectedChatId: (id: number | null) => void;
-  chatDetails: Array<{ id: number; title: string }>;
+  selectedChatId: string | null;
+  setSelectedChatId: (id: string | null) => void;
+  chatDetails: Array<{ id: string; title: string }>;
   className?: string;
 }
 
@@ -75,14 +75,17 @@ export function ChatSelector({
       focusFirstItemOnOpen={true}
     >
       <div
-        className="w-72 bg-black/90 backdrop-blur-md border border-white/10 rounded-md shadow-lg overflow-hidden"
+        className="fixed top-0 left-0 h-screen w-72 bg-black/90 backdrop-blur-md border-r border-white/10 shadow-lg overflow-hidden z-50"
         onKeyDown={handleKeyDown}
         role="menu"
       >
         <ChatHistorySidebar
-          className="w-72 h-[calc(100vh-3.5rem)]"
+          className="w-full h-full"
           selectedChatId={selectedChatId}
-          setSelectedChatId={setSelectedChatId}
+          setSelectedChatId={(id) => {
+            setSelectedChatId(id);
+            setIsChatHistoryOpen(false); // Close sidebar after selection
+          }}
         />
       </div>
     </Dropdown>

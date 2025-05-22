@@ -17,33 +17,19 @@ import { DropdownForm } from "./ui/dropdown-form";
 
 interface ChatHistoryProps {
   className?: string;
-  selectedChatId: number | null;
-  setSelectedChatId: (id: number | null) => void;
+  selectedChatId: string | null;
+  setSelectedChatId: (id: string | null) => void;
 }
 
 // This would typically come from an API in a real app
-const chatDetails = [
-  {
-    id: 1,
-    title: "Kubernetes Cluster Setup",
-    description: "Deployment plan for infrastructure",
-  },
-  {
-    id: 2,
-    title: "Docker Deployment",
-    description: "Microservices containerization",
-  },
-  { id: 3, title: "AWS Lambda Setup", description: "Serverless configuration" },
-];
 
 export function ChatHistorySidebar({
   className,
   selectedChatId,
   setSelectedChatId,
 }: ChatHistoryProps) {
-  const [chats, setChats] = useState(chatDetails);
   const [isAddingChat, setIsAddingChat] = useState(false);
-  const { setMessageHistory } = useMessages();
+  const { setMessageHistory, chatList } = useMessages();
 
   // Handler for creating a brand new chat
   const handleCreateNewChat = () => {
@@ -98,69 +84,55 @@ export function ChatHistorySidebar({
               descriptionPlaceholder="Description (optional)"
               showDescription={true}
               submitButtonText="Create"
-              onSubmit={(title) => {
-                // Generate a new unique ID
-                const newId = Math.max(...chats.map((chat) => chat.id), 0) + 1;
-
-                const newChat = {
-                  id: newId,
-                  title: title,
-                  description: "New conversation",
-                };
-
-                setChats([...chats, newChat]);
-                setIsAddingChat(false);
-
-                // Select the new chat
-                setSelectedChatId(newId);
-              }}
+              onSubmit={(title) => {}}
               onCancel={() => setIsAddingChat(false)}
               className="rounded-lg"
             />
-          )}
-
-          {chats.map((chat) => (
+          )}{" "}
+          {chatList?.map((chat) => (
             <Button
-              key={chat.id}
+              key={chat.session_id}
               variant="ghost"
               className={cn(
-                "w-full justify-start text-left rounded-lg py-4 px-5 transition-all duration-300 group relative overflow-hidden",
-                selectedChatId === chat.id
+                "w-full justify-start text-left rounded-lg py-3 px-4 transition-all duration-300 group relative overflow-hidden pt-6 pb-6",
+                selectedChatId === chat.session_id
                   ? "bg-gradient-to-r from-blue-500/20 to-teal-400/20 text-white border border-white/10"
                   : "text-white/80 hover:text-white hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-teal-400/10"
               )}
-              onClick={() => setSelectedChatId(chat.id)}
+              onClick={() => {}}
             >
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-teal-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative z-10 flex items-start gap-3">
+              <div className="relative z-10 flex items-center gap-3 w-full">
                 <MessageCircle
                   className={cn(
-                    "w-5 h-5 mt-0.5 flex-shrink-0",
-                    selectedChatId === chat.id
+                    "w-5 h-5 flex-shrink-0",
+                    selectedChatId === chat.session_id
                       ? "text-blue-400"
                       : "text-white/50 group-hover:text-blue-400"
                   )}
-                />
-                <div className="flex flex-col gap-1">
+                />{" "}
+                <div className="flex flex-col gap-0.5 w-52 min-w-0">
                   <span
                     className={cn(
-                      "font-medium text-sm transition-colors duration-300",
-                      selectedChatId === chat.id
+                      "font-medium text-sm transition-colors duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
+                      selectedChatId === chat.session_id
                         ? "text-blue-300"
                         : "group-hover:text-blue-300"
                     )}
+                    title={chat.title}
                   >
                     {chat.title}
                   </span>
                   <span
                     className={cn(
-                      "text-xs transition-colors duration-300",
-                      selectedChatId === chat.id
+                      "text-xs transition-colors duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
+                      selectedChatId === chat.session_id
                         ? "text-blue-200/80"
                         : "text-white/60 group-hover:text-white/80"
                     )}
+                    title="Last message preview"
                   >
-                    {chat.description}
+                    Last message preview
                   </span>
                 </div>
               </div>
@@ -185,8 +157,6 @@ export function ChatHistorySidebar({
           className="w-full bg-gradient-to-r from-red-500/10 to-orange-400/10 hover:from-red-500/20 hover:to-orange-400/20 text-white/80 hover:text-white
                      transition-all duration-200 flex items-center justify-center gap-2 py-2"
           onClick={() => {
-            // Clear chat history
-            setChats([]);
             setSelectedChatId(null);
             setMessageHistory();
           }}

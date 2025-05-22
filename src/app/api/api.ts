@@ -91,3 +91,8 @@ export const updateOrganization = async (
 
   return response.data;
 };
+
+export const getChatList = async (client_id: string | null) => {
+  const response = await api.post(`/get-chat-list/${client_id}`);
+  return response.data.chat_list;
+};

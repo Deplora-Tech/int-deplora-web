@@ -12,6 +12,11 @@ export type Message = {
   variation?: "chat" | "pipeline" | undefined;
 };
 
+export type Chat = {
+  session_id: string;
+  title: string;
+};
+
 export interface MessageContextType {
   messages: Message[];
   addMessage: (message: Omit<Message, "id">) => void;
@@ -25,4 +30,5 @@ export interface MessageContextType {
   setMessageHistory: () => void;
   graph: GraphType | null;
   allPipelineData: any;
+  chatList: Chat[];
 }
