@@ -15,6 +15,7 @@ export type Message = {
 export type Chat = {
   session_id: string;
   title: string;
+  created_At: string | null;
 };
 
 export interface MessageContextType {

@@ -14,6 +14,7 @@ import {
 import { useSession } from "../hooks/session";
 import { useMessages } from "../hooks/messages";
 import { DropdownForm } from "./ui/dropdown-form";
+import { groupChatsByDate } from "../lib/date-utils";
 
 interface ChatHistoryProps {
   className?: string;
@@ -46,7 +47,6 @@ export function ChatHistorySidebar({
       )}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-teal-400/5 blur-3xl rounded-full pointer-events-none" />
-
       <div className="px-6 pt-6 bg-gradient-to-r from-black/40 via-[#01010101] to-black/40 backdrop-blur-md relative z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -66,11 +66,10 @@ export function ChatHistorySidebar({
           >
             <Plus className="h-4 w-4" />
           </Button>
-        </div>
-      </div>
-
+        </div>{" "}
+      </div>{" "}
       <ScrollArea className="flex-1 px-2 py-4 relative z-10">
-        <div className="space-y-3">
+        <div className="space-y-4">
           {isAddingChat && (
             <DropdownForm
               title="New Conversation"
@@ -82,59 +81,59 @@ export function ChatHistorySidebar({
               onCancel={() => setIsAddingChat(false)}
               className="rounded-lg"
             />
-          )}{" "}
-          {chatList?.map((chat) => (
-            <Button
-              key={chat.session_id}
-              variant="ghost"
-              className={cn(
-                "w-full justify-start text-left rounded-lg py-3 px-4 transition-all duration-300 group relative overflow-hidden pt-6 pb-6",
-                selectedChatId === chat.session_id
-                  ? "bg-gradient-to-r from-blue-500/20 to-teal-400/20 text-white border border-white/10"
-                  : "text-white/80 hover:text-white hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-teal-400/10"
-              )}
-              onClick={() => {
-                window.location.href = `/chat/${chat.session_id}`;
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-teal-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <div className="relative z-10 flex items-center gap-3 w-full">
-                <MessageCircle
-                  className={cn(
-                    "w-5 h-5 flex-shrink-0",
-                    selectedChatId === chat.session_id
-                      ? "text-blue-400"
-                      : "text-white/50 group-hover:text-blue-400"
-                  )}
-                />{" "}
-                <div className="flex flex-col gap-0.5 w-52 min-w-0">
-                  <span
-                    className={cn(
-                      "font-medium text-sm transition-colors duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
-                      selectedChatId === chat.session_id
-                        ? "text-blue-300"
-                        : "group-hover:text-blue-300"
-                    )}
-                    title={chat.title}
-                  >
-                    {chat.title}
-                  </span>
-                  <span
-                    className={cn(
-                      "text-xs transition-colors duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
-                      selectedChatId === chat.session_id
-                        ? "text-blue-200/80"
-                        : "text-white/60 group-hover:text-white/80"
-                    )}
-                    title="Last message preview"
-                  ></span>
+          )}
+          {chatList &&
+            groupChatsByDate(chatList).map((group) => (
+              <div key={group.label} className="space-y-2">
+                <h3 className="text-xs font-medium text-white/50 px-3 py-1">
+                  {group.label}
+                </h3>
+                <div className="space-y-1">
+                  {group?.chats?.map((chat) => (
+                    <Button
+                      key={chat.session_id}
+                      variant="ghost"
+                      className={cn(
+                        "w-full justify-start text-left rounded-lg py-3 px-4 transition-all duration-300 group relative overflow-hidden pt-6 pb-6",
+                        selectedChatId === chat.session_id
+                          ? "bg-gradient-to-r from-blue-500/20 to-teal-400/20 text-white border border-white/10"
+                          : "text-white/80 hover:text-white hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-teal-400/10"
+                      )}
+                      onClick={() => {
+                        window.location.href = `/chat/${chat.session_id}`;
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-teal-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="relative z-10 flex items-center gap-3 w-full">
+                        <MessageCircle
+                          className={cn(
+                            "w-5 h-5 flex-shrink-0",
+                            selectedChatId === chat.session_id
+                              ? "text-blue-400"
+                              : "text-white/50 group-hover:text-blue-400"
+                          )}
+                        />{" "}
+                        <div className="flex flex-col gap-0.5 w-52 min-w-0">
+                          <span
+                            className={cn(
+                              "font-medium text-sm transition-colors duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
+                              selectedChatId === chat.session_id
+                                ? "text-blue-300"
+                                : "group-hover:text-blue-300"
+                            )}
+                            title={chat.title}
+                          >
+                            {chat.title}
+                          </span>
+                        </div>
+                      </div>
+                    </Button>
+                  ))}
                 </div>
               </div>
-            </Button>
-          ))}
+            ))}
         </div>
-      </ScrollArea>
-
+      </ScrollArea>{" "}
       <div className="p-4 border-t border-white/10 relative z-10">
         <Button
           variant="ghost"
@@ -144,19 +143,6 @@ export function ChatHistorySidebar({
         >
           <Plus className="w-4 h-4 text-blue-400" />
           <span>New Conversation</span>
-        </Button>
-
-        <Button
-          variant="ghost"
-          className="w-full bg-gradient-to-r from-red-500/10 to-orange-400/10 hover:from-red-500/20 hover:to-orange-400/20 text-white/80 hover:text-white
-                     transition-all duration-200 flex items-center justify-center gap-2 py-2"
-          onClick={() => {
-            setSelectedChatId(null);
-            setMessageHistory();
-          }}
-        >
-          <Trash2 className="w-4 h-4 text-red-400" />
-          <span>Clear History</span>
         </Button>
       </div>
     </div>

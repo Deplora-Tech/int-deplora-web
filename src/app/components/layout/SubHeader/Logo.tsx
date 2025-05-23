@@ -38,7 +38,7 @@ export function Logo({ size = "md", className = "", onClick }: LogoProps) {
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         aria-label="Go to homepage"
-        className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded-md"
+        className="outline-none"
         tabIndex={0}
       >
         Deplora

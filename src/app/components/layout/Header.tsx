@@ -7,9 +7,9 @@ import { OrganizationDropdown } from "./SubHeader/OrganizationDropdown";
 import { ChatSelector } from "./SubHeader/ChatSelector";
 
 interface HeaderProps {
-  selectedChatId: number | null;
-  setSelectedChatId: (id: number | null) => void;
-  chatDetails: Array<{ id: number; title: string }>;
+  selectedChatId: string | null;
+  setSelectedChatId: (id: string | null) => void;
+  chatDetails: Array<{ id: string; title: string }>;
 }
 
 export function Header({
