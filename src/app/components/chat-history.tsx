@@ -94,7 +94,7 @@ export function ChatHistorySidebar({
                       key={chat.session_id}
                       variant="ghost"
                       className={cn(
-                        "w-full justify-start text-left rounded-lg py-3 px-4 transition-all duration-300 group relative overflow-hidden pt-6 pb-6",
+                        "w-full justify-start text-left rounded-lg py-3 px-4 transition-all duration-300 group-[chat-item] relative overflow-hidden pt-6 pb-6",
                         selectedChatId === chat.session_id
                           ? "bg-gradient-to-r from-blue-500/20 to-teal-400/20 text-white border border-white/10"
                           : "text-white/80 hover:text-white hover:bg-gradient-to-r hover:from-blue-500/10 hover:to-teal-400/10"
@@ -103,23 +103,15 @@ export function ChatHistorySidebar({
                         window.location.href = `/chat/${chat.session_id}`;
                       }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-teal-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-teal-400/5 opacity-0 hover:opacity-100 transition-opacity duration-300" />
                       <div className="relative z-10 flex items-center gap-3 w-full">
-                        <MessageCircle
-                          className={cn(
-                            "w-5 h-5 flex-shrink-0",
-                            selectedChatId === chat.session_id
-                              ? "text-blue-400"
-                              : "text-white/50 group-hover:text-blue-400"
-                          )}
-                        />{" "}
                         <div className="flex flex-col gap-0.5 w-52 min-w-0">
                           <span
                             className={cn(
-                              "font-medium text-sm transition-colors duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
+                              "font-thin text-sm transition-colors duration-300 whitespace-nowrap overflow-hidden text-ellipsis",
                               selectedChatId === chat.session_id
                                 ? "text-blue-300"
-                                : "group-hover:text-blue-300"
+                                : "hover:text-blue-300"
                             )}
                             title={chat.title}
                           >

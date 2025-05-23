@@ -58,10 +58,10 @@ export function ChatSelector({
       ) : (
         <MessageSquare className="w-4 h-4 text-blue-400" />
       )}
-      <span className="text-sm font-medium text-white/80 group-hover:text-white transition-colors">
+      <span className="text-sm font-medium text-white/80">
         {selectedChatTitle || "New Chat"}
       </span>
-      <ChevronDown className="w-4 h-4 text-white/50 group-hover:text-white/80 transition-colors" />
+      <ChevronDown className="w-4 h-4 text-white/50" />
     </div>
   );
   return (
