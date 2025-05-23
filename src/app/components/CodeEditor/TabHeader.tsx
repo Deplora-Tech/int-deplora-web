@@ -11,27 +11,25 @@ interface TabsHeaderProps {
 
 export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
   const { session_id } = useSession();
-  const {setMessageHistory} = useMessages();
+  const { setMessageHistory } = useMessages();
 
   const handleDeploy = () => {
     // Show the modal popup
     setIsModalOpen(true);
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/execute/${session_id}`, {
-      method: 'POST',
-    }).then((res) => {
-      if (!res.ok) {
-        console.error("Failed to post status");
-        return;
-      }
-      setMessageHistory();
-    }
-    ).catch((err) => {
-      console.error("Error posting status:", err);
-    }
-    );
+      method: "POST",
+    })
+      .then((res) => {
+        if (!res.ok) {
+          console.error("Failed to post status");
+          return;
+        }
+        setMessageHistory();
+      })
+      .catch((err) => {
+        console.error("Error posting status:", err);
+      });
   };
-
-
 
   return (
     <div className="border-b border-white/[0.02]">
@@ -49,11 +47,15 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
           >
             Preview
           </TabsTrigger>
+          <TabsTrigger
+            value="cost_analysis"
+            className="text-sm data-[state=active]:bg-transparent data-[state=active]:text-blue-500"
+          >
+            Cost
+          </TabsTrigger>
         </TabsList>
 
-
         <div className="flex gap-2 p-2">
-
           <Button
             onClick={handleDeploy}
             size="sm"
@@ -62,7 +64,6 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
             <GitCommit className="w-4 h-4 mr-2" />
             Commit to Repository
           </Button>
-
 
           <Button
             onClick={handleDeploy}
@@ -76,7 +77,6 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
       </div>
 
       {/* Modal Popup */}
-
     </div>
   );
 }
