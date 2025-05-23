@@ -5,14 +5,14 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { sendMessage, load_conv } from "../api/api";
+import { sendMessage, load_conv, getChatList } from "../api/api";
 import {
   LoraStatus,
   ExcecutionStatus,
   GraphStatus,
   GraphType,
 } from "../constants/Enums";
-import type { Message, MessageContextType } from "../types/MessageTypes";
+import type { Chat, Message, MessageContextType } from "../types/MessageTypes";
 import { useSession } from "./session";
 import { GitRepo } from "../types/SessionType";
 
@@ -31,6 +31,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const websocketRef = useRef<WebSocket | null>(null);
   const [graph, setGraph] = useState<GraphType | null>(null);
   const { session_id, client_id, project } = useSession();
+  const [chatList, setChatList] = useState<Chat[]>([]);
 
   useEffect(() => {
     if (!session_id) return;
@@ -77,6 +78,15 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       websocket.close();
     };
   }, [session_id]);
+
+  useEffect(() => {
+    const getChatLst = async () => {
+      const response = await getChatList("1");
+      setChatList(response);
+      console.log("Chat List:", response);
+    };
+    getChatLst();
+  }, []);
 
   const addMessage = async (message: Omit<Message, "id">) => {
     if (!session_id) {
@@ -156,26 +166,28 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     console.log("Setting message history for session:", session_id);
 
-    load_conv(session_id).then(({ chat_history, current_plan, pipeline_data }) => {
-      const formattedMessages: Message[] = chat_history.map(
-        (chat: {
-          role: string;
-          message: any;
-          state: LoraStatus[];
-        }): Message => ({
-          id: crypto.randomUUID(),
-          content: chat.message,
-          sender: chat.role === "You" ? "Deplora" : chat.role,
-          timestamp: new Date(),
-          userId: 1,
-          state: chat.state,
-        })
-      );
-      console.log("Pipelines:", pipeline_data);
-      setMessages(formattedMessages);
-      setFileContent(current_plan);
-      setPipelineData(pipeline_data);
-    });
+    load_conv(session_id).then(
+      ({ chat_history, current_plan, pipeline_data }) => {
+        const formattedMessages: Message[] = chat_history.map(
+          (chat: {
+            role: string;
+            message: any;
+            state: LoraStatus[];
+          }): Message => ({
+            id: crypto.randomUUID(),
+            content: chat.message,
+            sender: chat.role === "You" ? "Deplora" : chat.role,
+            timestamp: new Date(),
+            userId: 1,
+            state: chat.state,
+          })
+        );
+        console.log("Pipelines:", pipeline_data);
+        setMessages(formattedMessages);
+        setFileContent(current_plan);
+        setPipelineData(pipeline_data);
+      }
+    );
   };
 
   return (
@@ -193,6 +205,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         setMessageHistory,
         graph,
         allPipelineData,
+        chatList,
       }}
     >
       {children}

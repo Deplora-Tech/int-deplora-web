@@ -13,9 +13,6 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { useMessages } from "../hooks/messages";
 import { LoraStatus } from "../constants/Enums";
-import AnimatedStatus from "./animated-status";
-import { SecureInputForm } from "./SecureMessage";
-import MissingInformationForm from "./missing-info";
 import NormalMessage from "./NormalMessage";
 import { ExcecutionMessage } from "./ExcecutionMessage";
 
@@ -84,9 +81,16 @@ export function Chat({ setPipelineData }: ChatProps) {
         className="flex-1 overflow-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
       >
         {messages?.map((message, index) =>
-          message.sender === "executor" ? <ExcecutionMessage key={index} message={message} setPipelineData={setPipelineData} /> : <NormalMessage key={index} message={message} index={index} />
+          message.sender === "executor" ? (
+            <ExcecutionMessage
+              key={index}
+              message={message}
+              setPipelineData={setPipelineData}
+            />
+          ) : (
+            <NormalMessage key={index} message={message} index={index} />
+          )
         )}
-        
       </div>
 
       {showScrollButton && (
