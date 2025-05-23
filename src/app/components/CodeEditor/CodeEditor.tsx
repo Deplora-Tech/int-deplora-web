@@ -16,6 +16,8 @@ import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import PreviewContent from "./PreviewContent";
 import { useSession } from "@/app/hooks/session";
+import CostDashboard from "../CostCalculation/CostDashboard";
+import { mockCostData } from "@/app/data/mockCostData";
 
 type FileTree = {
   [key: string]: FileTree | string;
@@ -273,6 +275,12 @@ export function CodeEditor({
           className="flex-1 mt-0 max-h-[76vh] overflow-auto "
         >
           <PreviewContent />
+        </TabsContent>
+        <TabsContent
+          value="cost_analysis"
+          className="flex-1 mt-0 max-h-[76vh] overflow-auto "
+        >
+          <CostDashboard costData={mockCostData} />
         </TabsContent>
       </Tabs>
       <FooterActions />

@@ -84,8 +84,8 @@ export const OrganizationProvider: React.FC<{ children: React.ReactNode }> = ({
     const fetchOrganizations = async () => {
       try {
         if (!user) return;
-        const response = await getOrganizations(user.id);
-        const data = await response.json();
+        const data = await getOrganizations(user.id);
+
         setOrganizations(data);
       } catch (error) {
         console.error("Error fetching organizations:", error);

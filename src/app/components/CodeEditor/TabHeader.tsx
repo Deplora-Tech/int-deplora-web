@@ -47,6 +47,12 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
           >
             Preview
           </TabsTrigger>
+          <TabsTrigger
+            value="cost_analysis"
+            className="text-sm data-[state=active]:bg-transparent data-[state=active]:text-blue-500"
+          >
+            Cost
+          </TabsTrigger>
         </TabsList>
 
         <div className="flex gap-2 p-2">
