@@ -1,9 +1,10 @@
 import axios from "axios";
+import { GitRepo } from "../types/SessionType";
 
 type MessageRequestBody = {
   message: string;
   client_id: string;
-  project_id: string;
+  project: GitRepo;
   organization_id: string;
   session_id: string;
 };
@@ -48,6 +49,7 @@ export const apigraph = axios.create({
 export const sendMessage = async (
   requestBody: MessageRequestBody
 ): Promise<ApiResponse> => {
+  console.log("Sending message:", JSON.stringify(requestBody));
   const response = await api.post("/send-message", {
     ...requestBody,
   });
