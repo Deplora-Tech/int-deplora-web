@@ -14,6 +14,7 @@ import {
 } from "../constants/Enums";
 import type { Message, MessageContextType } from "../types/MessageTypes";
 import { useSession } from "./session";
+import { GitRepo } from "../types/SessionType";
 
 const MessageContext = createContext<MessageContextType | undefined>(undefined);
 
@@ -23,12 +24,13 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const [statusMap, setStatusMap] = useState<Record<string, LoraStatus[]>>({});
   const [currentMessageId, setCurrentMessageId] = useState<string | null>(null);
   const [fileContent, setFileContent] = useState<Record<string, string>>({});
+  const [allPipelineData, setPipelineData] = useState<any>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [loraStatus, setLoraStatus] = useState<LoraStatus | undefined>();
   const [statuses, setStatuses] = useState<LoraStatus[]>([]);
   const websocketRef = useRef<WebSocket | null>(null);
   const [graph, setGraph] = useState<GraphType | null>(null);
-  const { session_id, setSessionId } = useSession();
+  const { session_id, client_id, project } = useSession();
 
   useEffect(() => {
     if (!session_id) return;
@@ -94,15 +96,15 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("Current message ID Set to:", id);
 
     try {
-      const reply = await sendMessage({
+      await sendMessage({
         message: message.content,
-        client_id: "1",
-        project_id: "1",
+        client_id: client_id ?? "",
+        project: project ?? {} as GitRepo,
         organization_id: "1",
         session_id: session_id,
       });
 
-      const messageContent = reply.processed_message.response;
+      // const messageContent = reply.processed_message.response;
       // setMessages((prev) => [
       //   ...prev,
       //   {
@@ -115,10 +117,10 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
       //   },
       // ]);
 
-      const fileContents = reply.processed_message.file_contents;
-      if (fileContents && Object.entries(fileContents).length > 0) {
-        setFileContent(fileContents);
-      }
+      // const fileContents = reply.processed_message.file_contents;
+      // if (fileContents && Object.entries(fileContents).length > 0) {
+      //   setFileContent(fileContents);
+      // }
 
       setLoraStatus(undefined);
       setMessageHistory();
@@ -154,24 +156,25 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     console.log("Setting message history for session:", session_id);
 
-    load_conv(session_id).then(({ chat_history, current_plan }) => {
+    load_conv(session_id).then(({ chat_history, current_plan, pipeline_data }) => {
       const formattedMessages: Message[] = chat_history.map(
         (chat: {
           role: string;
-          message: string;
+          message: any;
           state: LoraStatus[];
         }): Message => ({
           id: crypto.randomUUID(),
           content: chat.message,
-          sender: chat.role === "You" ? "Deplora" : "User",
+          sender: chat.role === "You" ? "Deplora" : chat.role,
           timestamp: new Date(),
           userId: 1,
           state: chat.state,
         })
       );
-      console.log("Formatted messages:", formattedMessages);
+      console.log("Pipelines:", pipeline_data);
       setMessages(formattedMessages);
       setFileContent(current_plan);
+      setPipelineData(pipeline_data);
     });
   };
 
@@ -189,6 +192,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         statuses,
         setMessageHistory,
         graph,
+        allPipelineData,
       }}
     >
       {children}

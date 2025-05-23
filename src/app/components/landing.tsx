@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDown, ArrowRight, CircleStop, Link } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useMessages } from "../hooks/messages";
@@ -13,21 +13,22 @@ import { motion } from "framer-motion";
 
 import { Popup } from "./popup"; // Import the Popup component
 import { useSession } from "../hooks/session";
+import MissingInformationForm from "./missing-info";
 
 export function LandingChat() {
   const [input, setInput] = useState("");
   const { messages, addMessage, loraStatus } = useMessages();
-  const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [containerElement, setContainerElement] =
+    useState<HTMLDivElement | null>(null);
 
   const [showPopup, setShowPopup] = useState(false); // Popup state
-  const { setSessionId, session_id , project_id, setProjectId} = useSession();
+  const { setSessionId, session_id, project } = useSession();
   const isLoraActive =
     loraStatus &&
     loraStatus !== LoraStatus.COMPLETED &&
     loraStatus !== LoraStatus.FAILED;
 
-  
   useEffect(() => {
     if (!session_id) {
       const id = v4();
@@ -36,33 +37,36 @@ export function LandingChat() {
     }
   }, []);
 
-
+  // Safely scroll to bottom
   const handleScrollToBottom = () => {
-    containerRef.current?.scrollTo({
-      top: containerRef.current.scrollHeight,
-      behavior: "smooth",
-    });
-  };
-
-  const handleScroll = () => {
-    if (containerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
-      setShowScrollButton(scrollHeight - scrollTop > clientHeight + 10);
+    if (containerElement) {
+      containerElement.scrollTo({
+        top: containerElement.scrollHeight,
+        behavior: "smooth",
+      });
     }
   };
 
+  // Safely check if we should show scroll button
+  const handleScroll = (e: any) => {
+    const target = e.target as HTMLDivElement;
+    if (target) {
+      const { scrollTop, scrollHeight, clientHeight } = target;
+      const shouldShowButton = scrollHeight - scrollTop > clientHeight + 10;
+      setShowScrollButton(shouldShowButton);
+    }
+  };
+
+  // Scroll to bottom whenever messages change
   useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      handleScroll();
-      container.addEventListener("scroll", handleScroll);
-      return () => container.removeEventListener("scroll", handleScroll);
+    if (containerElement && messages.length > 0) {
+      containerElement.scrollTop = containerElement.scrollHeight;
     }
-  }, [messages]);
+  }, [messages.length, containerElement]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!project_id) return; // Ensure a project is selected
+    if (!project) return; // Ensure a project is selected
     if (input.trim()) {
       addMessage({
         content: input,
@@ -76,14 +80,15 @@ export function LandingChat() {
 
   return (
     <div className="flex-1 flex flex-col items-center justify-center px-4  space-y-0 min-w-48">
-      {messages.length === 0 && (
+      {messages && messages.length === 0 && (
         <div className="space-y-4 text-center max-w-3xl mx-auto">
-          <h1 className="text-4xl sm:text-6xl font-bold text-white">
-            What do you want to build?
+          <h1 className="text-4xl sm:text-6xl font-extrabold text-white leading-tight">
+            Generate and Execute Your Deployment Plan
           </h1>
-          <p className="text-lg text-neutral-400">
-            Prompt, run, edit, and deploy full-stack web apps.
+          <p className="text-lg text-neutral-400 mt-4">
+            Configure, prompt, and deploy your full-stack app with ease.
           </p>
+
           <Button
             variant="outline"
             className="group relative px-4 py-2 text-s bg-neutral-900/50 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-neutral-200 hover:text-white transition-all"
@@ -100,7 +105,8 @@ export function LandingChat() {
       <div className="w-full max-w-4xl mx-auto">
         {messages.length > 0 && (
           <div
-            ref={containerRef}
+            ref={(el) => setContainerElement(el)}
+            onScroll={handleScroll}
             className="flex-1 overflow-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent max-h-[70vh] bg-neutral-900/50 rounded-lg"
           >
             {messages.map((message, index) => (
@@ -115,14 +121,26 @@ export function LandingChat() {
                   </Avatar>
                 )}
                 <div
-                  className={`flex-1 rounded-lg px-4 py-3 ${message.sender === "Deplora"
+                  className={`flex-1 rounded-lg px-4 py-3 ${
+                    message.sender === "Deplora"
                       ? "bg-white/[0.02]"
                       : "bg-white/[0.05]"
-                    }`}
+                  }`}
                 >
-                  <p className="text-sm text-neutral-200 leading-relaxed">
-                    {message.content}
-                  </p>
+                  <div className="text-sm text-gray-400 leading-relaxed font-medium w-full flex-col justify-center">
+                    {message.content.missing_information ? (
+                      <div className="w-full">
+                        <MissingInformationForm
+                          isActive={index === messages.length - 1}
+                          missingInformation={
+                            message.content.missing_information
+                          }
+                        />
+                      </div>
+                    ) : (
+                      message.content
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
@@ -131,7 +149,7 @@ export function LandingChat() {
 
         {showScrollButton && (
           <button
-            className="absolute left-1/2 transform -tranneutral-x-1/2 tranneutral-y-1 bg-blue-500 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg opacity-60 hover:opacity-100 transition-opacity"
+            className="absolute left-1/2 transform -translate-x-1/2 bg-blue-500 hover:bg-blue-700 text-white rounded-full p-3 shadow-lg opacity-60 hover:opacity-100 transition-opacity"
             onClick={handleScrollToBottom}
             style={{ bottom: "18%" }}
           >
@@ -161,9 +179,9 @@ export function LandingChat() {
             style={{
               display: input.length > 0 ? "flex" : "none",
             }}
-            disabled={!project_id} // Disable until a project is selected
+            disabled={!project} // Disable until a project is selected
             className={`absolute right-2 top-2 h-10 w-10 bg-blue-500 hover:bg-blue-600 text-white ${
-              !project_id ? "opacity-50 cursor-not-allowed" : ""
+              !project ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             {isLoraActive ? (
@@ -177,11 +195,6 @@ export function LandingChat() {
         {showPopup && (
           <Popup
             onClose={() => setShowPopup(false)}
-            onRepoSelect={(repo) => {
-              setProjectId(repo);
-              setShowPopup(false);
-            }}
-            selectedRepo={project_id!}
           />
         )}
 
@@ -200,7 +213,7 @@ export function LandingChat() {
           <div>
             <div className="mt-8 flex flex-wrap gap-2 justify-center">
               {[
-                "Generate a Docker deployment plan",
+                "Generate a Docker deployment plan for aws",
                 "Create a Kubernetes cluster setup",
                 "Automate deployment with Terraform",
                 "Set up CI/CD with Jenkins",

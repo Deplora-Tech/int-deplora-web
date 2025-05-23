@@ -16,6 +16,7 @@ export interface PipelineState {
   duration: number;
   timestamp: Date;
   currentStage: number;
+  building: boolean;
 }
 
 // Represents the context type for pipeline management

@@ -1,16 +1,20 @@
 import { createContext, useContext, useState } from "react";
-import {SessionContextType} from "../types/SessionType"
+import {GitRepo, SessionContextType} from "../types/SessionType"
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
+
+
 
 export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
     const  [session_id, setSessionId] = useState<string | null>(null);
-    const [project_id, setProjectId] = useState<string | null>(null);
+    const [project, setProject] = useState<GitRepo | null>(null);
+    const [client_id, setClientId] = useState<string | null>(null);
+
 
     return (
-        <SessionContext.Provider value={{ session_id, setSessionId , project_id, setProjectId }}>
+        <SessionContext.Provider value={{ session_id, setSessionId , project, setProject, client_id, setClientId }}>
             {children}
         </SessionContext.Provider>
     );

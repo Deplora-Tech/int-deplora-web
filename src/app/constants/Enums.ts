@@ -54,4 +54,5 @@ export enum DeploymentOptions {
     PENDING = "PENDING",
     SUCCESS = "SUCCESS",
     FAILED = "FAILED",
+    ABORTED = "ABORTED",
   }

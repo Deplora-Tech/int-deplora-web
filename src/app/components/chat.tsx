@@ -15,8 +15,15 @@ import { useMessages } from "../hooks/messages";
 import { LoraStatus } from "../constants/Enums";
 import AnimatedStatus from "./animated-status";
 import { SecureInputForm } from "./SecureMessage";
+import MissingInformationForm from "./missing-info";
+import NormalMessage from "./NormalMessage";
+import { ExcecutionMessage } from "./ExcecutionMessage";
 
-export function Chat() {
+interface ChatProps {
+  setPipelineData: (data: any) => void;
+}
+
+export function Chat({ setPipelineData }: ChatProps) {
   const { messages, addMessage, loraStatus } = useMessages();
   const [input, setInput] = useState("");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -49,7 +56,7 @@ export function Chat() {
   }, [messages]);
 
   useEffect(() => {
-    if (messages.length > 0 || loraStatus !== undefined) {
+    if ((messages && messages.length > 0) || loraStatus !== undefined) {
       handleScrollToBottom();
     }
   }, [messages.length, loraStatus]);
@@ -76,54 +83,10 @@ export function Chat() {
         ref={containerRef}
         className="flex-1 overflow-auto p-4 space-y-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent"
       >
-        {messages.map((message, index) => (
-          <div className="flex-col gap-1" key={message.id}>
-            <div key={message.id} className="flex-col gap-3 group pb-3 ">
-              <div className="flex items-center gap-2">
-                {message.sender === "User" && (
-                  <Avatar className="w-8 h-8 rounded-full overflow-hidden border border-white/[0.05] shrink-0">
-                    <img
-                      src={"/userlogo.svg"}
-                      alt={"User"}
-                      className="object-cover"
-                    />
-                  </Avatar>
-                )}
-                <div className="flex-1">
-                  <div
-                    className={`rounded-lg px-4 py-3 ${
-                      message.sender === "Deplora"
-                        ? "bg-gray-900/20"
-                        : "bg-white/[0.05]"
-                    }`}
-                  >
-                    <p className="text-sm text-gray-400 leading-relaxed font-medium">
-                      {message.type === "secure" && (
-                        <SecureInputForm messageData={message} />
-                      )}
-                      {message.content}
-                    </p>
-                  </div>
-                </div>
-              </div>
-              {index === messages.length - 1 && loraStatus && (
-                <div className="mt-2">
-                  <AnimatedStatus />
-                </div>
-              )}
-              {message.sender === "Deplora" &&
-                message.state &&
-                message.state.length > 0 && (
-                  <div className="mt-2">
-                    <AnimatedStatus
-                      statesList={message.state}
-                      key={message.id}
-                    />
-                  </div>
-                )}
-            </div>
-          </div>
-        ))}
+        {messages?.map((message, index) =>
+          message.sender === "executor" ? <ExcecutionMessage key={index} message={message} setPipelineData={setPipelineData} /> : <NormalMessage key={index} message={message} index={index} />
+        )}
+        
       </div>
 
       {showScrollButton && (
