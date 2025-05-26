@@ -30,8 +30,14 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
   const [statuses, setStatuses] = useState<LoraStatus[]>([]);
   const websocketRef = useRef<WebSocket | null>(null);
   const [graph, setGraph] = useState<GraphType | null>(null);
-  const { session_id, client_id, project } = useSession();
+  const { session_id, client_id, project, setClientId, setProject } = useSession();
   const [chatList, setChatList] = useState<Chat[]>([]);
+
+    useEffect(() => {
+    setClientId("user1")
+  }
+  , []);
+
 
   useEffect(() => {
     if (!session_id) return;
@@ -167,7 +173,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
     console.log("Setting message history for session:", session_id);
 
     load_conv(session_id).then(
-      ({ chat_history, current_plan, pipeline_data }) => {
+      ({ chat_history, current_plan, pipeline_data, project_data }) => {
         const formattedMessages: Message[] = chat_history.map(
           (chat: {
             role: string;
@@ -186,6 +192,7 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({
         setMessages(formattedMessages);
         setFileContent(current_plan);
         setPipelineData(pipeline_data);
+        setProject(project_data);
       }
     );
   };
