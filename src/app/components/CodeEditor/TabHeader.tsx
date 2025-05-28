@@ -144,18 +144,32 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
   };
   
   const handleDeploy = () => {
+
     // Close the env modal if it's open
     setEnvModalOpen(false);
     
     // Show the deployment modal popup
     setIsModalOpen(true);
-    
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/execute/${session_id}`, {
+
+    // fill envVariables with envValues before posting.
+    const filledEnvVariables: Record<string, EnvVariable> = {};
+    if (envVariables) {
+      // Combine user_vars and common_vars
+      const allVars = { ...envVariables.user_vars, ...envVariables.common_vars };
+      Object.entries(allVars).forEach(([key, variable]) => {
+        filledEnvVariables[key] = {
+          ...variable,
+          default: envValues[key] || variable.default || "",
+        };
+      });
+    }
+
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/execute`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ env_variables: envValues }),
+      body: JSON.stringify({ env_variables: filledEnvVariables, session_id }),
     })
       .then((res) => {
         if (!res.ok) {
@@ -387,7 +401,6 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
           </Dialog.Content>
         </Dialog.Portal>
       </Dialog.Root>
-      {JSON.stringify(envValues, null, 2)}
     </div>
   );
 }
