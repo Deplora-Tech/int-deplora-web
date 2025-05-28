@@ -14,6 +14,8 @@ import { motion } from "framer-motion";
 import { Popup } from "./popup"; // Import the Popup component
 import { useSession } from "../hooks/session";
 import MissingInformationForm from "./missing-info";
+import CostDashboard from "./CostCalculation/CostDashboard";
+import { mockCostData } from "../data/mockCostData";
 
 export function LandingChat() {
   const [input, setInput] = useState("");
@@ -165,6 +167,18 @@ export function LandingChat() {
             </div>
           </div>
         ) : null}
+        <div className="flex justify-center items-center gap-3 mt-6 mb-4">
+          <div className="flex items-center gap-2 px-4 py-3 bg-neutral-900/60 border border-neutral-800/50 rounded-lg backdrop-blur-sm">
+            <div
+              className={`w-2 h-2 rounded-full animate-pulse ${
+                project ? "bg-emerald-500" : "bg-red-500"
+              }`}
+            ></div>
+            <span className="text-neutral-300 font-mono text-sm tracking-wide">
+              {project?.name || "No project selected"}
+            </span>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="relative mt-4">
           <Input
@@ -192,11 +206,7 @@ export function LandingChat() {
           </Button>
         </form>
 
-        {showPopup && (
-          <Popup
-            onClose={() => setShowPopup(false)}
-          />
-        )}
+        {showPopup && <Popup onClose={() => setShowPopup(false)} />}
 
         <div className="mt-2 flex items-center justify-center gap-1 text-xs text-neutral-500">
           <span>Use</span>

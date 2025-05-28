@@ -20,7 +20,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     const fetchUser = async () => {
       try {
         setUser({
-          id: "123",
+          id: "1",
           name: "John Doe",
           email: "jo",
         });
