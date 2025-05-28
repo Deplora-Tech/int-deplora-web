@@ -165,7 +165,7 @@ export function Popup({ onClose }: PopupProps) {
                   variant="outline"
                   className="w-full text-left flex items-center gap-3 bg-neutral-900/50 border-neutral-800 hover:border-cyan-500/50 hover:bg-neutral-800/50 transition-all group"
                   onClick={() => handleRepoSelect({
-                    id: project.project_id,
+                    id: project.id,
                     repo_url: project.repo_url,
                     branch: project.branch,
                     name: String(project.repo_url).split("/").slice(-2).join("/"),

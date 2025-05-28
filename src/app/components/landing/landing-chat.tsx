@@ -187,13 +187,7 @@ export function LandingChat() {
       </div>
 
       {/* Popup for missing information */}
-      {showPopup && (
-        <Popup
-          onClose={() => setShowPopup(false)}
-          onRepoSelect={() => {}}
-          selectedRepo={""}
-        />
-      )}
+      {showPopup && <Popup onClose={() => setShowPopup(false)} />}
     </div>
   );
 }
