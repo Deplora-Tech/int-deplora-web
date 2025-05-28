@@ -25,8 +25,8 @@ type FileTree = {
 };
 
 // Function to build a file tree structure
-function buildFileTree(files: string[], project: GitRepo): FileTree {
-  let tree: FileTree = { };
+function buildFileTree(files: string[], project: GitRepo | null): FileTree {
+  let tree: FileTree = {};
   files.forEach((path) => {
     const parts = path.split("/");
     let current = tree;
@@ -39,7 +39,8 @@ function buildFileTree(files: string[], project: GitRepo): FileTree {
   });
 
   tree = {
-    [project.name]: tree}; // Wrap the tree in the project name}
+    [project?.name || "project"]: tree,
+  };
   return tree;
 }
 
@@ -69,7 +70,12 @@ function renderFileTree(
               <ChevronRight className="w-3 h-3" />
             )}
             <FolderIcon className="w-3 h-3" />
-            <span>{key}</span>
+            <span
+              className="max-w-[130px] truncate overflow-hidden text-ellipsis"
+              title={key} // This adds a tooltip that shows on hover
+            >
+              {key}
+            </span>
           </div>
         ) : (
           <div
@@ -111,7 +117,7 @@ export function FileList({
   selectedFile: string;
   setSelectedFile: React.Dispatch<React.SetStateAction<string>>;
 }) {
-  const {project} = useSession()
+  const { project } = useSession();
   const filePaths = Object.keys(fileContent);
   const fileTree = buildFileTree(filePaths, project);
   const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({});
