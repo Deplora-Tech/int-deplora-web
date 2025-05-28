@@ -19,17 +19,21 @@ interface LogViewerProps {
   pipelineData?: PipelineState;
 }
 
-export function LogViewer({ stage, onClose, pipelineData: propPipelineData }: LogViewerProps) {
-  const { pipelineData : hookPipelineData } = usePipeline();
+export function LogViewer({
+  stage,
+  onClose,
+  pipelineData: propPipelineData,
+}: LogViewerProps) {
+  const { pipelineData: hookPipelineData } = usePipeline();
   const pipelineData = propPipelineData || hookPipelineData;
+
   // Split long log lines (> 130 chars) into multiple lines
   const stageLogs =
     pipelineData.stages
-      ?.find((s) => s.name === stage.name)
-      ?.logs
-      ?.flatMap((log) =>
+      ?.find((s: PipelineStage) => s.name === stage.name)
+      ?.logs?.flatMap((log: string) =>
         log.length > 130
-          ? log.match(/.{1,130}/g) // split into 130-char chunks
+          ? log.match(/.{1,130}/g) || [log] // split into 130-char chunks, handle null
           : [log]
       ) || [];
 
@@ -42,9 +46,10 @@ export function LogViewer({ stage, onClose, pipelineData: propPipelineData }: Lo
         </Button>
       </div>
       <ScrollArea className="h-[300px] p-4" scrollToBottom={true}>
-        {stageLogs.map((log, index) => {
+        {" "}
+        {stageLogs.map((log: string, index: number) => {
           // Convert the ANSI log string to HTML
-          const html = converter.toHtml(log);
+          const html = converter.toHtml(log || "");
 
           return (
             <div
