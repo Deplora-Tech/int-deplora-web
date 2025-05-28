@@ -98,7 +98,7 @@ export function LandingChat() {
           >
             <span className="flex items-center gap-2">
               <Link className="w-4 h-4" />
-              Add Project
+              Select Project
             </span>
             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-xl" />
           </Button>
@@ -208,17 +208,6 @@ export function LandingChat() {
 
         {showPopup && <Popup onClose={() => setShowPopup(false)} />}
 
-        <div className="mt-2 flex items-center justify-center gap-1 text-xs text-neutral-500">
-          <span>Use</span>
-          <kbd className="px-1.5 py-0.5 text-[10px] bg-neutral-800 rounded border border-neutral-700">
-            Shift
-          </kbd>
-          <span>+</span>
-          <kbd className="px-1.5 py-0.5 text-[10px] bg-neutral-800 rounded border border-neutral-700">
-            Return
-          </kbd>
-          <span>for a new line</span>
-        </div>
         {messages.length === 0 && (
           <div>
             <div className="mt-8 flex flex-wrap gap-2 justify-center">
