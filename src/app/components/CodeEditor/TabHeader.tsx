@@ -31,9 +31,11 @@ interface EnvVariablesResponse {
 export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
   const { session_id } = useSession();
   const { setMessageHistory } = useMessages();
-  
+
   const [envModalOpen, setEnvModalOpen] = useState(false);
-  const [envVariables, setEnvVariables] = useState<EnvVariablesResponse | null>(null);
+  const [envVariables, setEnvVariables] = useState<EnvVariablesResponse | null>(
+    null
+  );
   const [envValues, setEnvValues] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
 
@@ -54,10 +56,10 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
       })
       .then((data: EnvVariablesResponse) => {
         console.log("Environment check result:", data);
-        
+
         // Initialize env values with defaults
         const initialValues: Record<string, string> = {};
-        
+
         // Get user_vars defaults
         if (data && data.user_vars) {
           Object.entries(data.user_vars).forEach(([key, variable]) => {
@@ -68,7 +70,7 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
             }
           });
         }
-        
+
         // Get common_vars defaults
         if (data && data.common_vars) {
           Object.entries(data.common_vars).forEach(([key, variable]) => {
@@ -79,7 +81,7 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
             }
           });
         }
-        
+
         setEnvValues(initialValues);
         setEnvVariables(data);
         setEnvModalOpen(true);
@@ -90,36 +92,36 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
       .finally(() => {
         setIsLoading(false);
       });
-  }
+  };
 
   // Check if all required variables have values
   const areAllVarsSet = () => {
     if (!envVariables) return false;
-    
+
     // Check user_vars
     for (const key in envVariables.user_vars) {
       if (!envValues[key]) return false;
     }
-    
+
     // Check common_vars
     for (const key in envVariables.common_vars) {
       if (!envValues[key]) return false;
     }
-    
+
     return true;
   };
-  
+
   // Sort variables with empty values first
-  const getSortedVariables = (): { 
-    empty: [string, EnvVariable][]; 
-    filled: [string, EnvVariable][] 
+  const getSortedVariables = (): {
+    empty: [string, EnvVariable][];
+    filled: [string, EnvVariable][];
   } => {
     if (!envVariables) return { empty: [], filled: [] };
-    
+
     const allVars = { ...envVariables.user_vars, ...envVariables.common_vars };
     const empty: [string, EnvVariable][] = [];
     const filled: [string, EnvVariable][] = [];
-    
+
     Object.entries(allVars).forEach(([key, variable]) => {
       if (!envValues[key]) {
         empty.push([key, variable]);
@@ -127,27 +129,26 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
         filled.push([key, variable]);
       }
     });
-    
+
     return { empty, filled };
   };
-  
+
   const handleInputChange = (key: string, value: string) => {
-    setEnvValues(prev => ({
+    setEnvValues((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
-  
+
   // Helper to check if the variable is a number type
   const isNumericType = (type: string) => {
-    return type === 'number' || type.includes('int') || type.includes('float');
+    return type === "number" || type.includes("int") || type.includes("float");
   };
-  
-  const handleDeploy = () => {
 
+  const handleDeploy = () => {
     // Close the env modal if it's open
     setEnvModalOpen(false);
-    
+
     // Show the deployment modal popup
     setIsModalOpen(true);
 
@@ -155,7 +156,10 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
     const filledEnvVariables: Record<string, EnvVariable> = {};
     if (envVariables) {
       // Combine user_vars and common_vars
-      const allVars = { ...envVariables.user_vars, ...envVariables.common_vars };
+      const allVars = {
+        ...envVariables.user_vars,
+        ...envVariables.common_vars,
+      };
       Object.entries(allVars).forEach(([key, variable]) => {
         filledEnvVariables[key] = {
           ...variable,
@@ -239,7 +243,8 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
                 Configure Environment Variables
               </Dialog.Title>
               <Dialog.Description className="mt-2 text-sm text-gray-400">
-                Set values for deployment environment variables. Empty fields are shown at the top.
+                Set values for deployment environment variables. Empty fields
+                are shown at the top.
               </Dialog.Description>
               <Dialog.Close asChild>
                 <button
@@ -250,75 +255,35 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
                 </button>
               </Dialog.Close>
             </div>
-            
+
             <div className="px-6 py-4 overflow-y-auto max-h-[60vh]">
               {envVariables && (
                 <div className="flex flex-col gap-4">
-                  {/* Empty variables first */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {getSortedVariables().empty.map(([key, variable]) => (
-                      <div key={key} className="border border-red-500/30 rounded-lg p-4 bg-red-500/5">
-                      <div className="flex justify-between">
-                        <label htmlFor={key} className="block text-sm font-medium text-white mb-1">
-                        {key}
-                        </label>
-                        {variable.sensitive && (
-                        <span className="text-xs text-red-400 rounded-md px-1">Sensitive</span>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-400 mb-2">
-                        {variable.description}
-                        {variable.type.includes("list") && (
-                        <span className="ml-1 text-blue-400">(comma-separated values)</span>
-                        )}
-                      </p>
-                      {variable.type.includes("list") ? (
-                        <input
-                        type="text"
-                        id={key}
-                        value={envValues[key] || ""}
-                        onChange={(e) => handleInputChange(key, e.target.value)}
-                        placeholder={variable.default !== undefined ? (Array.isArray(variable.default) ? variable.default.join(", ") : String(variable.default)) : ""}
-                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white text-sm focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      ) : isNumericType(variable.type) ? (
-                        <input
-                        type="number"
-                        id={key}
-                        value={envValues[key] || ""}
-                        onChange={(e) => handleInputChange(key, e.target.value)}
-                        placeholder={variable.default !== undefined ? String(variable.default) : ""}
-                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white text-sm focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      ) : (
-                        <input
-                        type={variable.sensitive ? "password" : "text"}
-                        id={key}
-                        value={envValues[key] || ""}
-                        onChange={(e) => handleInputChange(key, e.target.value)}
-                        placeholder={variable.default !== undefined ? String(variable.default) : ""}
-                        className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white text-sm focus:ring-blue-500 focus:border-blue-500"
-                        />
-                      )}
-                      </div>
-                    ))}
-                    </div>
-                  {/* Variables with values */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {getSortedVariables().filled.map(([key, variable]) => (
-                      <div key={key} className="border border-gray-700 rounded-lg p-4">
+                    {getSortedVariables().empty.map(([key, variable]) => (
+                      <div
+                        key={key}
+                        className="border border-red-500/30 rounded-lg p-4 bg-red-500/5"
+                      >
                         <div className="flex justify-between">
-                          <label htmlFor={key} className="block text-sm font-medium text-white mb-1">
+                          <label
+                            htmlFor={key}
+                            className="block text-sm font-medium text-white mb-1"
+                          >
                             {key}
                           </label>
                           {variable.sensitive && (
-                            <span className="text-xs text-yellow-500 rounded-md px-1">Sensitive</span>
+                            <span className="text-xs text-red-400 rounded-md px-1">
+                              Sensitive
+                            </span>
                           )}
                         </div>
                         <p className="text-xs text-gray-400 mb-2">
                           {variable.description}
                           {variable.type.includes("list") && (
-                            <span className="ml-1 text-blue-400">(comma-separated values)</span>
+                            <span className="ml-1 text-blue-400">
+                              (comma-separated values)
+                            </span>
                           )}
                         </p>
                         {variable.type.includes("list") ? (
@@ -326,8 +291,16 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
                             type="text"
                             id={key}
                             value={envValues[key] || ""}
-                            onChange={(e) => handleInputChange(key, e.target.value)}
-                            placeholder={variable.default !== undefined ? (Array.isArray(variable.default) ? variable.default.join(", ") : String(variable.default)) : ""}
+                            onChange={(e) =>
+                              handleInputChange(key, e.target.value)
+                            }
+                            placeholder={
+                              variable.default !== undefined
+                                ? Array.isArray(variable.default)
+                                  ? variable.default.join(", ")
+                                  : String(variable.default)
+                                : ""
+                            }
                             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white text-sm focus:ring-blue-500 focus:border-blue-500"
                           />
                         ) : isNumericType(variable.type) ? (
@@ -335,8 +308,14 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
                             type="number"
                             id={key}
                             value={envValues[key] || ""}
-                            onChange={(e) => handleInputChange(key, e.target.value)}
-                            placeholder={variable.default !== undefined ? String(variable.default) : ""}
+                            onChange={(e) =>
+                              handleInputChange(key, e.target.value)
+                            }
+                            placeholder={
+                              variable.default !== undefined
+                                ? String(variable.default)
+                                : ""
+                            }
                             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white text-sm focus:ring-blue-500 focus:border-blue-500"
                           />
                         ) : (
@@ -344,8 +323,93 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
                             type={variable.sensitive ? "password" : "text"}
                             id={key}
                             value={envValues[key] || ""}
-                            onChange={(e) => handleInputChange(key, e.target.value)}
-                            placeholder={variable.default !== undefined ? String(variable.default) : ""}
+                            onChange={(e) =>
+                              handleInputChange(key, e.target.value)
+                            }
+                            placeholder={
+                              variable.default !== undefined
+                                ? String(variable.default)
+                                : ""
+                            }
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white text-sm focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                  {/* Variables with values */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {getSortedVariables().filled.map(([key, variable]) => (
+                      <div
+                        key={key}
+                        className="border border-gray-700 rounded-lg p-4"
+                      >
+                        <div className="flex justify-between">
+                          <label
+                            htmlFor={key}
+                            className="block text-sm font-medium text-white mb-1"
+                          >
+                            {key}
+                          </label>
+                          {variable.sensitive && (
+                            <span className="text-xs text-yellow-500 rounded-md px-1">
+                              Sensitive
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-400 mb-2">
+                          {variable.description}
+                          {variable.type.includes("list") && (
+                            <span className="ml-1 text-blue-400">
+                              (comma-separated values)
+                            </span>
+                          )}
+                        </p>
+                        {variable.type.includes("list") ? (
+                          <input
+                            type="text"
+                            id={key}
+                            value={envValues[key] || ""}
+                            onChange={(e) =>
+                              handleInputChange(key, e.target.value)
+                            }
+                            placeholder={
+                              variable.default !== undefined
+                                ? Array.isArray(variable.default)
+                                  ? variable.default.join(", ")
+                                  : String(variable.default)
+                                : ""
+                            }
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white text-sm focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        ) : isNumericType(variable.type) ? (
+                          <input
+                            type="number"
+                            id={key}
+                            value={envValues[key] || ""}
+                            onChange={(e) =>
+                              handleInputChange(key, e.target.value)
+                            }
+                            placeholder={
+                              variable.default !== undefined
+                                ? String(variable.default)
+                                : ""
+                            }
+                            className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white text-sm focus:ring-blue-500 focus:border-blue-500"
+                          />
+                        ) : (
+                          <input
+                            type={variable.sensitive ? "password" : "text"}
+                            id={key}
+                            value={envValues[key] || ""}
+                            onChange={(e) =>
+                              handleInputChange(key, e.target.value)
+                            }
+                            placeholder={
+                              variable.default !== undefined
+                                ? String(variable.default)
+                                : ""
+                            }
                             className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white text-sm focus:ring-blue-500 focus:border-blue-500"
                           />
                         )}
@@ -355,10 +419,13 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
                 </div>
               )}
             </div>
-            
+
             <div className="px-6 py-4 border-t border-gray-800 bg-gray-900 flex justify-between items-center">
               {!areAllVarsSet() && (
-                <div className="flex items-center text-yellow-500 text-sm" role="alert">
+                <div
+                  className="flex items-center text-yellow-500 text-sm"
+                  role="alert"
+                >
                   <AlertTriangle className="w-4 h-4 mr-2" aria-hidden="true" />
                   Some variables are not set
                 </div>
@@ -368,7 +435,7 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
                   All variables are set
                 </div>
               )}
-              
+
               <div className="flex gap-2">
                 <Button
                   onClick={() => setEnvModalOpen(false)}
@@ -378,7 +445,7 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
                 >
                   Cancel
                 </Button>
-                
+
                 {areAllVarsSet() ? (
                   <Button
                     onClick={handleDeploy}
