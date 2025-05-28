@@ -18,14 +18,15 @@ import PreviewContent from "./PreviewContent";
 import { useSession } from "@/app/hooks/session";
 import CostDashboard from "../CostCalculation/CostDashboard";
 import { mockCostData } from "@/app/data/mockCostData";
+import { GitRepo } from "@/app/types/SessionType";
 
 type FileTree = {
   [key: string]: FileTree | string;
 };
 
 // Function to build a file tree structure
-function buildFileTree(files: string[]): FileTree {
-  const tree: FileTree = {};
+function buildFileTree(files: string[], project: GitRepo): FileTree {
+  let tree: FileTree = { };
   files.forEach((path) => {
     const parts = path.split("/");
     let current = tree;
@@ -36,6 +37,9 @@ function buildFileTree(files: string[]): FileTree {
       current = current[part] as FileTree;
     });
   });
+
+  tree = {
+    [project.name]: tree}; // Wrap the tree in the project name}
   return tree;
 }
 
@@ -107,8 +111,9 @@ export function FileList({
   selectedFile: string;
   setSelectedFile: React.Dispatch<React.SetStateAction<string>>;
 }) {
+  const {project} = useSession()
   const filePaths = Object.keys(fileContent);
-  const fileTree = buildFileTree(filePaths);
+  const fileTree = buildFileTree(filePaths, project);
   const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({});
 
   const toggleFolder = (folderPath: string) => {
@@ -120,11 +125,11 @@ export function FileList({
 
   return (
     <div className="flex-1 p-2 text-sm">
-      <div className="flex items-center gap-1 text-neutral-500 py-1">
+      {/* <div className="flex items-center gap-1 text-neutral-500 py-1">
         <ChevronDown className="w-3 h-3" />
         <FolderIcon className="w-3 h-3" />
         <span>src</span>
-      </div>
+      </div> */}
       <div className="space-y-1 text-neutral-400">
         {renderFileTree(
           fileTree,

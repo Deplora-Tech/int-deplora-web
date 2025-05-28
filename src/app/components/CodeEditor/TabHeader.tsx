@@ -13,6 +13,29 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
   const { session_id } = useSession();
   const { setMessageHistory } = useMessages();
 
+  const handleStartDeploy = () => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/check-env/${session_id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          console.error("Failed to check environment");
+          return;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Environment check result:", data);
+      })
+      .catch((err) => {
+        console.error("Error checking environment:", err);
+      }
+  );
+  }
+
   const handleDeploy = () => {
     // Show the modal popup
     setIsModalOpen(true);
@@ -66,7 +89,7 @@ export function TabsHeader({ setIsModalOpen }: TabsHeaderProps) {
           </Button>
 
           <Button
-            onClick={handleDeploy}
+            onClick={handleStartDeploy}
             size="sm"
             className="bg-gradient-to-r from-blue-500 to-teal-400 hover:bg-blue-600 text-white"
           >
