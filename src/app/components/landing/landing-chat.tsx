@@ -187,7 +187,13 @@ export function LandingChat() {
       </div>
 
       {/* Popup for missing information */}
-      {showPopup && <Popup onClose={() => setShowPopup(false)} />}
+
+      {showPopup && (
+        <Popup
+          onClose={() => setShowPopup(false)}
+        />
+      )}
+
     </div>
   );
 }

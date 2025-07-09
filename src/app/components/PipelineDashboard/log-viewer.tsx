@@ -49,7 +49,9 @@ export function LogViewer({
         {" "}
         {stageLogs.map((log: string, index: number) => {
           // Convert the ANSI log string to HTML
-          const html = converter.toHtml(log || "");
+
+          const html = converter.toHtml(log ?? "");
+
 
           return (
             <div
