@@ -27,11 +27,11 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
 # Expose the port
-EXPOSE 3000
+EXPOSE 80
 
 # Set healthcheck
-HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/ || exit 1
+# HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+#   CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
 
 # Run the application
-CMD ["npm", "start"]
+CMD ["npm", "start", "--", "-p", "80"]
