@@ -8,9 +8,9 @@ import { Header } from "./components/layout/Header";
 
 // Mock data - in a real app, this would come from an API or state management
 const chatDetails = [
-  { id: 1, title: "Kubernetes Cluster Setup" },
-  { id: 2, title: "Docker Deployment" },
-  { id: 3, title: "AWS Lambda Setup" },
+  { id: "1", title: "Kubernetes Cluster Setup" },
+  { id: "2", title: "Docker Deployment" },
+  { id: "3", title: "AWS Lambda Setup" },
 ];
 
 export default function RootLayout({
@@ -18,7 +18,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
 
   return (
     <html lang="en" className="dark">

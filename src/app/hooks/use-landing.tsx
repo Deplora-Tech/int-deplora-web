@@ -11,7 +11,7 @@ export function useLandingState() {
     useState<HTMLDivElement | null>(null);
   const [showPopup, setShowPopup] = useState(false);
 
-  const { setSessionId, session_id, project_id, setProjectId } = useSession();
+  const { setSessionId, session_id } = useSession();
 
   // Initialize session if needed
   useEffect(() => {
@@ -49,8 +49,6 @@ export function useLandingState() {
     showPopup,
     setShowPopup,
     session_id,
-    project_id,
-    setProjectId,
     handleScrollToBottom,
     handleScroll,
   };

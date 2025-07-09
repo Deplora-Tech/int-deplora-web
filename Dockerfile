@@ -7,6 +7,6 @@ COPY . /app
 RUN npm install
 RUN npm run build
 
-EXPOSE 8080
+EXPOSE 3000
 
-CMD ["npx", "next", "start", "-p", "${PORT}"]
+CMD ["npx", "next", "start", "-p", "3000"]

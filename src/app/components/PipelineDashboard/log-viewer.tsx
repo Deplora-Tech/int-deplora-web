@@ -44,7 +44,7 @@ export function LogViewer({ stage, onClose, pipelineData: propPipelineData }: Lo
       <ScrollArea className="h-[300px] p-4" scrollToBottom={true}>
         {stageLogs.map((log, index) => {
           // Convert the ANSI log string to HTML
-          const html = converter.toHtml(log);
+          const html = converter.toHtml(log ?? "");
 
           return (
             <div

@@ -190,8 +190,6 @@ export function LandingChat() {
       {showPopup && (
         <Popup
           onClose={() => setShowPopup(false)}
-          onRepoSelect={() => {}}
-          selectedRepo={""}
         />
       )}
     </div>
